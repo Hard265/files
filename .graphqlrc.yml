@@ -1,0 +1,22 @@
+schema:
+    - ./graphql/schema.graphql
+documents:
+    - ./graphql/**/*.gql
+extensions:
+    codegen:
+        generates:
+            ./graphql/__generated__/:
+                preset: client
+        plugins:
+            - client-preset
+            - typescript
+            - typescript-operations
+            - typescript-react-apollo
+        config:
+            - preResolveTypes: true
+            - nonOptionalTypenames: true
+        presetConfig:
+            gqlTagName: gql
+        ignoreNoDocuments: true
+        verbose: true
+overwrite: true

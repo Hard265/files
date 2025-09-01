@@ -1,0 +1,216 @@
+enum ContentType {
+  FILE
+  FOLDER
+}
+
+input CreateFileInput {
+  folderId: UUID
+  file: Upload!
+  name: String = null
+  starred: Boolean = false
+}
+
+input CreateFilePermissionInput {
+  userId: UUID!
+  fileId: UUID!
+  role: RoleEnum!
+}
+
+input CreateFolderInput {
+  name: String!
+  parentId: UUID
+  starred: Boolean = false
+}
+
+input CreateFolderPermissionInput {
+  userId: UUID!
+  folderId: UUID!
+  role: RoleEnum!
+}
+
+input CreateLinkInput {
+  fileId: UUID
+  folderId: UUID
+  permission: LinkPermission!
+  password: String
+  expiresAt: DateTime
+}
+
+"""Date with time (isoformat)"""
+scalar DateTime
+
+type File {
+  id: UUID!
+  folderId: UUID
+  file: String!
+  name: String!
+  mimeType: String!
+  ext: String!
+  size: Int!
+  starred: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type FilePermission {
+  id: UUID!
+  userId: UUID!
+  fileId: UUID!
+  role: RoleEnum!
+}
+
+input FilterInput {
+  type: ContentType = null
+  mimeType: String = null
+  createdAtAfter: DateTime = null
+  createdAtBefore: DateTime = null
+  updatedAtAfter: DateTime = null
+  updatedAtBefore: DateTime = null
+  sizeGreaterThan: Int = null
+  sizeLessThan: Int = null
+  ownerId: UUID = null
+  sharedWithMe: Boolean = null
+  sharedByMe: Boolean = null
+  starred: Boolean = null
+}
+
+type Folder {
+  id: UUID!
+  name: String!
+  parentId: UUID
+  starred: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type FolderPermission {
+  id: UUID!
+  userId: UUID!
+  folderId: UUID!
+  role: RoleEnum!
+}
+
+type Link {
+  id: UUID!
+  token: String!
+  fileId: UUID
+  folderId: UUID
+  userId: UUID!
+  permisssion: LinkPermission!
+  password: String
+  createdAt: DateTime!
+  expiresAt: DateTime
+}
+
+enum LinkPermission {
+  edit
+  view
+}
+
+type Mutation {
+  createFile(fileInput: CreateFileInput!): File!
+  updateFile(id: UUID!, fileInput: UpdateFileInput!): File
+  deleteFile(id: UUID!): Boolean!
+  createFolder(folderInput: CreateFolderInput!): Folder!
+  updateFolder(id: UUID!, folderInput: UpdateFolderInput!): Folder
+  deleteFolder(id: UUID!): Boolean!
+  createLink(linkInput: CreateLinkInput!): Link!
+  updateLink(id: UUID!, linkInput: UpdateLinkInput!): Link
+  deleteLink(id: UUID!): Boolean!
+  createFilePermission(permissionInput: CreateFilePermissionInput!): FilePermission!
+  updateFilePermission(id: UUID!, permissionInput: UpdateFilePermissionInput!): FilePermission
+  deleteFilePermission(id: UUID!): Boolean!
+  createFolderPermission(permissionInput: CreateFolderPermissionInput!): FolderPermission!
+  updateFolderPermission(id: UUID!, permissionInput: UpdateFolderPermissionInput!): FolderPermission
+  deleteFolderPermission(id: UUID!): Boolean!
+}
+
+input PaginationInput {
+  skip: Int = 0
+  limit: Int = 100
+}
+
+type Query {
+  user(id: UUID!): User
+  users(pagination: PaginationInput = null, sort: [SortInput!] = null): [User!]!
+  file(id: UUID!): File
+  files(folderId: UUID = null, pagination: PaginationInput = null, sort: [SortInput!] = null): [File!]!
+  folder(id: UUID!): Folder
+  folders(folderId: UUID = null, pagination: PaginationInput = null, sort: [SortInput!] = null): [Folder!]!
+  link(id: UUID!): Link
+  links(pagination: PaginationInput = null, sort: [SortInput!] = null): [Link!]!
+  filePermission(id: UUID!): FilePermission
+  filePermissions(pagination: PaginationInput = null, sort: [SortInput!] = null): [FilePermission!]!
+  folderPermission(id: UUID!): FolderPermission
+  folderPermissions(pagination: PaginationInput = null, sort: [SortInput!] = null): [FolderPermission!]!
+  search(query: String!, folderId: UUID = null, filter: FilterInput = null): SearchResult!
+  hello: String!
+}
+
+enum RoleEnum {
+  owner
+  editor
+  viewer
+}
+
+type SearchResult {
+  files: [File!]!
+  folders: [Folder!]!
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+input SortInput {
+  field: String!
+  direction: SortDirection! = ASC
+}
+
+scalar UUID
+
+input UpdateFileInput {
+  folderId: UUID = null
+  file: String = null
+  name: String = null
+  mimeType: String = null
+  ext: String = null
+  size: Int = null
+  starred: Boolean = null
+}
+
+input UpdateFilePermissionInput {
+  userId: UUID = null
+  fileId: UUID = null
+  role: RoleEnum = null
+}
+
+input UpdateFolderInput {
+  name: String = null
+  parentId: UUID = null
+  starred: Boolean = null
+}
+
+input UpdateFolderPermissionInput {
+  userId: UUID = null
+  folderId: UUID = null
+  role: RoleEnum = null
+}
+
+input UpdateLinkInput {
+  fileId: UUID = null
+  folderId: UUID = null
+  permission: LinkPermission = null
+  password: String = null
+  expiresAt: DateTime = null
+}
+
+scalar Upload
+
+type User {
+  id: UUID!
+  email: String!
+  isActive: Boolean!
+}
+

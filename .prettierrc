@@ -1,0 +1,6 @@
+{
+    "experimentalOperatorPosition": "start",
+    "experimentalTernaries": true,
+    "tabWidth": 4,
+    "printWidth": 70
+}

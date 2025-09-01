@@ -1,0 +1,11 @@
+fragment FileFields on File {
+        id
+        name
+        folderId
+        starred
+        ext
+        size
+        mimeType
+        updatedAt
+        createdAt
+}

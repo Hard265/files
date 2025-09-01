@@ -1,0 +1,5 @@
+query GetFolder($id: UUID!) {
+  folder(id: $id) {
+    ... FolderFields
+  }
+}
