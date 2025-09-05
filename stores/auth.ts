@@ -6,6 +6,7 @@ import {
     runInAction,
 } from "mobx";
 import * as SecureStore from "expo-secure-store";
+import { ApolloClient } from "@apollo/client";
 
 interface Token {
     accessToken: string;
@@ -13,18 +14,27 @@ interface Token {
     tokenType: string;
 }
 
+export interface User {
+    id?: string;
+    email: string;
+    is_active?: boolean;
+}
+
 export class AuthStore {
     private token: Token | null = null;
+    user: User | null = null;
     isLoading: boolean = false;
 
     constructor() {
-        makeObservable<this, "token">(this, {
+        makeObservable<this, "token" | "user">(this, {
             token: observable,
+            user: observable,
             isLoading: observable,
             isAuthenticated: computed,
             authorizationHeader: computed,
             setup: action,
             signin: action,
+            signout: action,
         });
         this.setup();
     }
@@ -34,13 +44,16 @@ export class AuthStore {
             this.isLoading = true;
         });
         let token: string | null = null;
+        let user: string | null = null;
         try {
             token = await SecureStore.getItemAsync("token");
+            user = await SecureStore.getItemAsync("user");
         } catch (err) {
             console.error(err);
         } finally {
             runInAction(() => {
                 if (token) this.token = JSON.parse(token);
+                if (user) this.user = JSON.parse(user);
                 this.isLoading = false;
             });
         }
@@ -56,13 +69,32 @@ export class AuthStore {
         return {};
     }
 
-    async signin(token: Token) {
+    async signin(token: Token, user: User) {
         try {
             await SecureStore.setItemAsync("token", JSON.stringify(token));
-        } catch {
-            console.log("failed to persist token");
+            await SecureStore.setItemAsync("user", JSON.stringify(user));
+        } catch (err) {
+            console.log("failed to persist token", err);
         } finally {
-            runInAction(() => (this.token = token));
+            runInAction(() => {
+                this.token = token;
+                this.user = user;
+            });
+        }
+    }
+
+    async signout(client: ApolloClient<any>) {
+        try {
+            await SecureStore.deleteItemAsync("token");
+            await SecureStore.deleteItemAsync("user");
+            await client.clearStore();
+        } catch (err) {
+            console.log("failed to clear token", err);
+        } finally {
+            runInAction(() => {
+                this.token = null;
+                this.user = null;
+            });
         }
     }
 }

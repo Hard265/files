@@ -4,8 +4,13 @@ import { useSuspenseFragment } from "@apollo/client/react";
 import { FolderFieldsFragmentDoc } from "@/graphql/__generated__/graphql";
 import { Text } from "@/components/Text";
 import { Skeleton } from "@/components/Skeleton";
+import { View } from "react-native";
 
-export default function FolderListHeader({ id }: { id: string }) {
+export default function FolderListHeader({
+    id = null,
+}: {
+    id?: string | null;
+}) {
     const { data } = useSuspenseFragment({
         fragment: FolderFieldsFragmentDoc,
         from: {
@@ -15,7 +20,9 @@ export default function FolderListHeader({ id }: { id: string }) {
 
     return (
         <Animated.View>
-            <Text variant="largeTitle">{data.name}</Text>
+            <View className="p-4">
+                <Text variant="largeTitle">{data.name}</Text>
+            </View>
             <FolderListToolbar />
         </Animated.View>
     );

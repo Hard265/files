@@ -1,5 +1,5 @@
 import { File, Folder } from "@/graphql/__generated__/graphql";
-import { FlashList } from "@shopify/flash-list";
+import { FlashList, FlashListProps } from "@shopify/flash-list";
 import { Suspense, useCallback } from "react";
 import FolderListItem from "@/partials/FolderListItem";
 import { Text } from "@/components/Text";
@@ -10,9 +10,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 interface FolderListProps {
     items: (File | Folder)[];
+    onScroll?: FlashListProps<File | Folder>["onScroll"];
 }
 
-function FolderList({ items }: FolderListProps) {
+function FolderList({ items, onScroll }: FolderListProps) {
     const navigation =
         useNavigation<
             NativeStackNavigationProp<RootStackParamsList>
@@ -44,6 +45,8 @@ function FolderList({ items }: FolderListProps) {
         <FlashList
             data={items}
             renderItem={render}
+            estimatedItemSize={50}
+            onScroll={onScroll}
             keyExtractor={(item) => item.id}
         />
     );

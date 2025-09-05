@@ -24,11 +24,15 @@ export default function SignInPage() {
         setLoading(true);
         try {
             const { data } = await api.post("/token", state.values);
-            await store.auth.signin({
+            const token = {
                 accessToken: data.access_token,
                 refreshToken: data.refresh_token,
                 tokenType: data.token_type,
+            };
+            const { data: user } = await api.get("/users/me", {
+                headers: { Authorization: `Bearer ${token.accessToken}` },
             });
+            await store.auth.signin(token, user);
         } catch (err) {
             const e = err as unknown as AxiosError;
             if (_.isArray((e.response?.data as any).detail)) {

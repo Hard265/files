@@ -40,7 +40,17 @@ const retryLink = new RetryLink({
 });
 
 const client = new ApolloClient({
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache().restore({
+        "Folder:null": {
+            __typename: "Folder",
+            id: "null",
+            name: "Home",
+            createdAt: "",
+            updatedAt: "",
+            starred: false,
+            parentId: null,
+        },
+    }),
     link: ApolloLink.from([retryLink, authLink, httpLink]),
 });
 

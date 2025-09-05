@@ -34,6 +34,9 @@ const RootStack = createNativeStackNavigator({
                 },
                 Folder: {
                     screen: FolderPage,
+                    options: {
+                        animation: "slide_from_right",
+                    },
                 },
             },
         },
@@ -42,6 +45,8 @@ const RootStack = createNativeStackNavigator({
         headerStyle: {
             backgroundColor: theme.colors.background,
         },
+        headerShadowVisible: false,
+        freezeOnBlur: true,
     }),
 });
 

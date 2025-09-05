@@ -5,8 +5,9 @@ import {
     GetFolderDocument,
     GetFolderQuery,
 } from "@/graphql/__generated__/graphql";
+import useFolderPage from "@/hooks/useFolderPage";
 import FolderList from "@/partials/FolderList";
-import FolderListToolbar from "@/partials/FolderListToolbar";
+import FolderListHeader from "@/partials/FolderListHeader";
 import { RootStackParamsList } from "@/Router";
 import { useSuspenseQuery } from "@apollo/client/react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -38,9 +39,10 @@ export default function FolderPage({
         | Folder
     )[];
 
+    useFolderPage(route.params.id);
     return (
         <View className="flex-1">
-            <FolderListToolbar />
+            <FolderListHeader id={route.params.id} />
             <FolderList items={items} />
         </View>
     );

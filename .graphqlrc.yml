@@ -17,6 +17,8 @@ extensions:
             - nonOptionalTypenames: true
         presetConfig:
             gqlTagName: gql
+            fragmentMasking: 
+                unmaskFunctionName: getFragmentData
         ignoreNoDocuments: true
         verbose: true
 overwrite: true

@@ -5,10 +5,13 @@ import {
 } from "@/graphql/__generated__/graphql";
 import { useSuspenseQuery } from "@apollo/client/react";
 import { View } from "react-native";
-import FolderListToolbar from "@/partials/FolderListToolbar";
 import FolderList from "@/partials/FolderList";
+import useFolderPage from "@/hooks/useFolderPage";
+import useHeaderScroll from "@/hooks/useHeaderScroll";
+import FolderListHeader from "@/partials/FolderListHeader";
 
 export default function HomePage() {
+    const { headerStyle } = useHeaderScroll();
     const { data } = useSuspenseQuery(GetFolderContentsDocument);
 
     const items = [...data.folders, ...data.files] as (
@@ -16,9 +19,10 @@ export default function HomePage() {
         | Folder
     )[];
 
+    useFolderPage(null);
     return (
         <View className="flex-1">
-            <FolderListToolbar />
+            <FolderListHeader />
             <FolderList items={items} />
         </View>
     );
