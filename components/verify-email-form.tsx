@@ -9,6 +9,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import {RootStackParamsList} from "@/Router";
+import {RouteProp, useRoute} from "@react-navigation/native";
 import * as React from "react";
 import { type TextStyle, View } from "react-native";
 
@@ -19,6 +21,8 @@ const TABULAR_NUMBERS_STYLE: TextStyle = {
 };
 
 export function VerifyEmailForm() {
+    const route =
+        useRoute<RouteProp<RootStackParamsList, "VerifyEmail">>();
     const { countdown, restartCountdown } = useCountdown(
         RESEND_CODE_INTERVAL_SECONDS,
     );
@@ -36,7 +40,7 @@ export function VerifyEmailForm() {
                     </CardTitle>
                     <CardDescription className="text-center sm:text-left">
                         Enter the verification code sent to
-                        m@example.com
+                        {route.params.email}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="gap-6">

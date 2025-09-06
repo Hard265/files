@@ -72,8 +72,8 @@ export function SignUpForm() {
                         Create your account
                     </CardTitle>
                     <CardDescription className="text-center sm:text-left">
-                        Welcome! Please fill in the details to get
-                        started.
+                        The safest way to store your data online.
+                        Upload, sync and share your files.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="gap-6">

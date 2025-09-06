@@ -79,10 +79,11 @@ export function SignInForm() {
             <Card className="shadow-none border-border/0 sm:border-border sm:shadow-sm sm:shadow-black/5">
                 <CardHeader>
                     <CardTitle className="text-xl text-center sm:text-left">
-                        Sign in to your app
+                        Sign in to llama files
                     </CardTitle>
                     <CardDescription className="text-center sm:text-left">
-                        Welcome back! Please sign in to continue
+                        The safest way to store your data online.
+                        Upload, sync and share your files.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="gap-6">
