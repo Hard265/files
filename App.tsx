@@ -1,11 +1,7 @@
 import "@/global.css";
 import Navigation from "@/Router";
 import { ApolloProvider } from "@apollo/client/react";
-import {
-    DarkTheme,
-    ThemeProvider,
-    DefaultTheme,
-} from "@react-navigation/native";
+import { ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { setBackgroundColorAsync } from "expo-system-ui";
 import React, { useEffect, useMemo } from "react";
@@ -14,11 +10,10 @@ import client from "./services/client";
 import { MenuProvider } from "react-native-popup-menu";
 import LoadingPage from "./components/LoadingPage";
 import FatalError from "./components/FatalError";
-import colors from "tailwindcss/colors";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PortalHost } from "@rn-primitives/portal";
-import { ErrorBoundary } from "react-error-boundary";
-import { StatusBar } from "expo-status-bar"
+import { StatusBar } from "expo-status-bar";
+import { NAV_THEME } from "./lib/theme";
 export default function App() {
     const colorSchemeName = useColorScheme();
     const [fontsLoaded, fontsErr] = useFonts({
@@ -29,18 +24,9 @@ export default function App() {
 
     const theme = useMemo(
         () =>
-            colorSchemeName === "dark" ?
-                {
-                    ...DarkTheme,
-                    colors: {
-                        ...DarkTheme.colors,
-                        background: colors.black,
-                        card: colors.neutral[800],
-                        text: colors.neutral[50],
-                        border: colors.neutral[600],
-                    },
-                }
-            :   DefaultTheme,
+            NAV_THEME[
+                (colorSchemeName as "light" | "dark") || "light"
+            ],
         [colorSchemeName],
     );
 
@@ -54,17 +40,17 @@ export default function App() {
 
     return (
         <ThemeProvider value={theme}>
-            <ErrorBoundary fallback={<FatalError />}>
-                <ApolloProvider client={client}>
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                        <MenuProvider>
-                            <Navigation theme={theme} />
-                            <PortalHost name="modal" />
-                        </MenuProvider>
-                    </GestureHandlerRootView>
-                </ApolloProvider>
-            </ErrorBoundary>
-            <StatusBar style="auto" />
+            <ApolloProvider client={client}>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                    <MenuProvider>
+                        <Navigation theme={theme} />
+                        <PortalHost name="modal" />
+                    </MenuProvider>
+                </GestureHandlerRootView>
+            </ApolloProvider>
+            <StatusBar
+                style={colorSchemeName === "dark" ? "light" : "dark"}
+            />
         </ThemeProvider>
     );
 }

@@ -7,9 +7,17 @@ import {
 import HomePage from "./pages/Home";
 import SignInPage from "./pages/SignIn";
 import FolderPage from "./pages/Folder";
+import SignUpPage from "./pages/SignUp";
+import VerifyEmailPage from "./pages/VerifyEmail";
+import ForgotPasswordPage from "./pages/ForgotPassword";
 
 export type RootStackParamsList = {
     SignIn: undefined;
+    SignUp: undefined;
+    VerifyEmail: {
+        email: string;
+    };
+    ForgotPassword: undefined;
     Home: undefined;
     Folder: {
         id: string;
@@ -23,6 +31,27 @@ const RootStack = createNativeStackNavigator({
             screens: {
                 SignIn: {
                     screen: SignInPage,
+                    options: {
+                        title: "Sign in",
+                    },
+                },
+                SignUp: {
+                    screen: SignUpPage,
+                    options: {
+                        title: "Sign up",
+                    },
+                },
+                VerifyEmail: {
+                    screen: VerifyEmailPage,
+                    options: {
+                        title: "Verify email",
+                    },
+                },
+                ForgotPassword: {
+                    screen: ForgotPasswordPage,
+                    options: {
+                        title: "Forgot password",
+                    },
                 },
             },
         },

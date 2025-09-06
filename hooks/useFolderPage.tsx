@@ -1,7 +1,7 @@
 import { FolderFieldsFragmentDoc } from "@/graphql/__generated__/graphql";
 import FolderPageHeaderRight from "@/partials/FolderPageHeaderRight";
 import { RootStackParamsList } from "@/Router";
-import { useSuspenseFragment } from "@apollo/client/react";
+import { useApolloClient, useSuspenseFragment } from "@apollo/client/react";
 import {
     useFocusEffect,
     useNavigation,
@@ -14,6 +14,7 @@ import { Avatar } from "@/components";
 import _ from "lodash";
 import { PixelRatio } from "react-native";
 import useBackHandler from "./useBackHandler";
+import { RectButton } from "react-native-gesture-handler";
 
 const getUrlMemoized = _.memoize(getGravatarUrl);
 
@@ -22,6 +23,7 @@ export default function useFolderPage(id: string | null = null) {
         useNavigation<
             NativeStackNavigationProp<RootStackParamsList>
         >();
+    const client = useApolloClient();
     const { data } = useSuspenseFragment({
         fragment: FolderFieldsFragmentDoc,
         from: {
@@ -58,10 +60,12 @@ export default function useFolderPage(id: string | null = null) {
                                 store.auth.user.email,
                             );
                             return (
-                                <Avatar
-                                    source={{ uri: url }}
-                                    size={avatarSize}
-                                />
+                                <RectButton onPress={() => {store.auth.signout(client)}}>
+                                    <Avatar
+                                        source={{ uri: url }}
+                                        size={avatarSize}
+                                    />
+                                </RectButton>
                             );
                         }
                     ),
