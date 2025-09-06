@@ -1,6 +1,4 @@
-import { FC } from "react";
 import { ColorValue, Text } from "react-native";
-import { createIconSet } from "react-native-vector-icons";
 
 const glyphMap = {
     ABS_fill: 59648,

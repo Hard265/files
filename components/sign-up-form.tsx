@@ -12,8 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
 import useFormReducer from "@/hooks/useFormReducer";
+import { RootStackParamsList } from "@/Router";
 import api from "@/services/api";
-import store from "@/stores";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AxiosError } from "axios";
@@ -27,7 +27,7 @@ export function SignUpForm() {
             NativeStackNavigationProp<RootStackParamsList>
         >();
     const passwordInputRef = React.useRef<TextInput>(null);
-    const [submitting, setLoading] = React.useState(false);
+    const [submitting, setSubmitting] = React.useState(false);
     const {
         state,
         action: onChange,
@@ -42,7 +42,26 @@ export function SignUpForm() {
     }
 
     async function onSubmit() {
-        navigation.navigate("VerifyEmail");
+        try {
+            await api.post("/users", state.values);
+            navigation.navigate("VerifyEmail", {
+                email: state.values.email,
+            });
+        } catch (err) {
+            const e = err as unknown as AxiosError;
+            if (_.isArray((e.response?.data as any).detail)) {
+                transformValueErrors(
+                    (e.response?.data as any).detail,
+                ).forEach(({ field, errors }) => {
+                    setErrors(
+                        field as keyof typeof state.values,
+                        errors,
+                    );
+                });
+            }
+        } finally {
+            setSubmitting(false);
+        }
     }
 
     return (

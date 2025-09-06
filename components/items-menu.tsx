@@ -6,10 +6,14 @@ import {
 } from "./ui/popover";
 import { Text } from "./ui/text";
 import { IconButton } from "./Button";
-import { Button } from "./ui/button";
 import Icon from "./Icon";
-import { Pressable, View } from "react-native";
-import { ComponentProps } from "react";
+import {
+    Pressable,
+    ScrollView,
+    useWindowDimensions,
+    View,
+} from "react-native";
+import { ComponentProps, memo, Suspense, useState } from "react";
 import { Separator } from "./ui/separator";
 import {
     File,
@@ -17,13 +21,18 @@ import {
     FolderOrFileFieldsFragmentDoc,
 } from "@/graphql/__generated__/graphql";
 import { useSuspenseFragment } from "@apollo/client/react";
+import { formatBytesIEC } from "@/utils";
+import dayjs from "dayjs";
 
 interface IItemMenuProps {
     refs: `${NonNullable<(Folder | File)["__typename"]>}:${string}`[];
 }
 
-export function ItemsMenu(props: IItemMenuProps) {
+const Options = memo(function Options(
+    props: Pick<IItemMenuProps, "refs">,
+) {
     const { colors } = useTheme();
+    const dimensions = useWindowDimensions();
     const { data } = useSuspenseFragment({
         fragment: FolderOrFileFieldsFragmentDoc,
         fragmentName: "FolderOrFileFields",
@@ -32,6 +41,7 @@ export function ItemsMenu(props: IItemMenuProps) {
         },
     });
     const count = props.refs.length;
+
     const items: ({
         name: string;
         icon: ComponentProps<typeof Icon>["name"];
@@ -88,13 +98,17 @@ export function ItemsMenu(props: IItemMenuProps) {
             icon: "information_line",
         },
     ];
-
     return (
-        <Popover onOpenChange={(open) => console.log("open", open)}>
-            <PopoverTrigger>
-                <IconButton name="more_2_line" />
-            </PopoverTrigger>
-            <PopoverContent className="w-auto">
+        <>
+            <Text>
+                {count > 1 ?
+                    `${count} selected`
+                :   (data as any)?.name}
+            </Text>
+            <Separator orientation="horizontal" />
+            <ScrollView
+                style={{ maxHeight: dimensions.height / 1.5 }}
+            >
                 {items.map((item, index) =>
                     item === null ?
                         <Separator
@@ -113,6 +127,42 @@ export function ItemsMenu(props: IItemMenuProps) {
                             <Text>{item.name}</Text>
                         </Pressable>,
                 )}
+            </ScrollView>
+            <Separator orientation="horizontal" />
+            {props.refs.length === 1 && (
+                <View className="py-2.5 flex-col gap-y-1 px-4">
+                    <Text variant="small">
+                        Created at:{" "}
+                        {dayjs((data as any)?.createdAt).format(
+                            "DD MMM YYYY HH:mm",
+                        )}
+                    </Text>
+                    {data.__typename === "File" && (
+                        <Text variant="small">
+                            Size:{" "}
+                            {formatBytesIEC((data as any)?.size)}
+                        </Text>
+                    )}
+                </View>
+            )}
+        </>
+    );
+});
+
+export function ItemsMenu(props: IItemMenuProps) {
+    const [shown, setShown] = useState(false);
+
+    return (
+        <Popover onOpenChange={(open) => setShown(open)}>
+            <PopoverTrigger>
+                <IconButton name="more_2_line" />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto">
+                <Suspense fallback={<Text>Loading...</Text>}>
+                    {props.refs.length > 0 && shown && (
+                        <Options refs={props.refs} />
+                    )}
+                </Suspense>
             </PopoverContent>
         </Popover>
     );

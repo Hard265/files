@@ -1,34 +1,23 @@
 import { IconButton } from "@/components";
 import Checkbox from "@/components/Checkbox";
-import Popup from "@/components/Popup";
 import { Text } from "@/components/Text";
 import store, { ListView, sortFields } from "@/stores";
 import { observer } from "mobx-react-lite";
-import { View } from "react-native";
-import FolderItemsOptions from "./FolderItemsOptions";
+import { Pressable, View } from "react-native";
+import { ItemsMenu } from "@/components/items-menu";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 
 function FolderListToolbar() {
     const hasSelection = store.ui.selectionCount > 0;
-    const isAscOrder = store.ui.sortField.order === "asc";
 
     return (
         <View className="flex-row items-center justify-between px-3 pb-2">
             <View className="flex-row items-center gap-x-4">
                 <Checkbox />
-                {/*<IconButton
-                    name={
-                        isAscOrder ?
-                            "sort_ascending_line"
-                        :   "sort_descending_line"
-                    }
-                    onPress={() =>
-                        store.ui.setSort(
-                            `${store.ui.sortField.field}:${
-                                isAscOrder ? "desc" : "asc"
-                            }`,
-                        )
-                    }
-                />*/}
                 <SortMenu />
             </View>
             <View className="flex-row items-center gap-x-4">
@@ -37,7 +26,7 @@ function FolderListToolbar() {
                         <Text variant="title3">
                             {store.ui.selectionCount} selected
                         </Text>
-                        <FolderItemsOptions
+                        <ItemsMenu
                             refs={[...store.ui.selectedItems]}
                         />
                     </>
@@ -49,58 +38,93 @@ function FolderListToolbar() {
 
 const SortMenu = observer(() => {
     const onChange = (field: (typeof sortFields)[number]) => {
-        console.log(field);
         store.ui.setSort(`${field}:${store.ui.sortField.order}`);
     };
+
+    const fields: {
+        label: string;
+        value: (typeof sortFields)[number];
+    }[] = [
+        {
+            label: "Name",
+            value: "name",
+        },
+        {
+            label: "Size",
+            value: "size",
+        },
+        {
+            label: "Created At",
+            value: "createdAt",
+        },
+        {
+            label: "Updated At",
+            value: "updatedAt",
+        },
+    ];
+
     return (
-        <Popup
-            onChange={onChange as any}
-            items={[
-                {
-                    label: "Name",
-                    value: "name",
-                },
-                {
-                    label: "Size",
-                    value: "size",
-                },
-                {
-                    label: "Created At",
-                    value: "createdAt",
-                },
-                {
-                    label: "Updated At",
-                    value: "updatedAt",
-                },
-            ]}
-        >
-            <Text className="capitalize">
-                {store.ui.sortField.field}
-            </Text>
-        </Popup>
+        <Popover>
+            <PopoverTrigger>
+                <Text className="capitalize">
+                    {store.ui.sortField.field}
+                </Text>
+            </PopoverTrigger>
+            <PopoverContent
+                side="bottom"
+                align="end"
+                className="w-auto"
+            >
+                {fields.map((field) => (
+                    <Pressable
+                        onPress={() => onChange(field.value)}
+                        key={field.value}
+                        className="px-4 py-2 flex-row items-center gap-x-2"
+                    >
+                        <Text>{field.label}</Text>
+                    </Pressable>
+                ))}
+            </PopoverContent>
+        </Popover>
     );
 });
 
 const ListViewMenu = observer(() => {
+    const list = [
+        {
+            label: "Comfortable",
+            value: "comfortable" as ListView,
+            icon: "list_check_3_line",
+        },
+        {
+            label: "Compact",
+            value: "compact" as ListView,
+            icon: "list_check_line",
+        },
+    ];
     return (
-        <Popup
-            onChange={(view) => store.ui.setListView(view as any)}
-            title="View as:"
-            items={[
-                {
-                    label: "Comfortable",
-                    value: "comfortable" as ListView,
-                    icon: "list_check_3_line",
-                },
-                {
-                    label: "Compact",
-                    value: "compact" as ListView,
-                    icon: "list_check_line",
-                },
-            ]}
-        >
-            <IconButton name="menu_line" />
-        </Popup>
+        <Popover>
+            <PopoverTrigger>
+                <IconButton name="more_2_line" />
+            </PopoverTrigger>
+            <PopoverContent
+                side="bottom"
+                align="end"
+                className="w-auto"
+            >
+                {list.map((view) => (
+                    <Pressable
+                        onPress={() =>
+                            store.ui.setListView(view.value)
+                        }
+                        key={view.value}
+                        className="px-4 py-2 flex-row items-center gap-x-2"
+                    >
+                        <Text>{view.label}</Text>
+                    </Pressable>
+                ))}
+            </PopoverContent>
+        </Popover>
     );
 });
 

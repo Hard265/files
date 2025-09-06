@@ -1,10 +1,10 @@
 import { Pressable, View } from "react-native";
-import { Text } from "./Text";
 import Checkbox from "./Checkbox";
 import { ReactNode } from "react";
 // eslint-disable-next-line import/no-named-as-default
 import clsx from "clsx";
 import { useTheme } from "@react-navigation/native";
+import { Text } from "./ui/text";
 
 interface ListItemProps {
     title: string;
@@ -78,10 +78,7 @@ export default function ListItem({
                         {title}
                     </Text>
                     {subtitle && !isCompact && (
-                        <Text
-                            variant="subhead"
-                            className="opacity-75"
-                        >
+                        <Text variant="small" className="opacity-75">
                             {subtitle}
                         </Text>
                     )}

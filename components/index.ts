@@ -1,10 +1,7 @@
 export * from "./Avatar";
 export * from "./Button";
-export * from "./Checkbox";
-export * from "./ErrorBoundary";
+export { default as Checkbox } from "./Checkbox";
+export { default as ErrorBoundary } from "./ErrorBoundary";
 export * from "./Icon";
-export * from "./Input";
-export * from "./Link";
-export * from "./ListItem";
+export { default as ListItem } from "./ListItem";
 export * from "./Skeleton";
-export * from "./Text";
