@@ -1,5 +1,6 @@
 schema:
     - ./graphql/schema.graphql
+    - ./graphql/client-schema.graphql
 documents:
     - ./graphql/**/*.gql
 extensions:
@@ -17,8 +18,6 @@ extensions:
             - nonOptionalTypenames: true
         presetConfig:
             gqlTagName: gql
-            fragmentMasking: 
-                unmaskFunctionName: getFragmentData
         ignoreNoDocuments: true
         verbose: true
 overwrite: true

@@ -25,7 +25,7 @@ interface IPopupProps {
 export default function Popup(props: PropsWithChildren<IPopupProps>) {
     const { colors } = useTheme();
     return (
-        <Menu>
+        <Menu onSelect={props.onChange}>
             <MenuTrigger>{props.children}</MenuTrigger>
             <MenuOptions
                 customStyles={{
@@ -45,9 +45,11 @@ export default function Popup(props: PropsWithChildren<IPopupProps>) {
                     },
                 }}
             >
-                <View>
-                    <Text>{props.title}</Text>
-                </View>
+                {props.title && (
+                    <View className="p-4 py-2.5">
+                        <Text>{props.title}</Text>
+                    </View>
+                )}
                 {props.items.map((item, index) => (
                     <MenuOption key={item.value} value={item.value}>
                         {item.icon && (

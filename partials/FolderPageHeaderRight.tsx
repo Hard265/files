@@ -1,22 +1,23 @@
+import {IconButton} from "@/components";
 import Icon from "@/components/Icon";
 import { RootStackParamsList } from "@/Router";
 import store from "@/stores";
-import {useApolloClient} from "@apollo/client/react";
 import {
     RouteProp,
     useRoute,
     useTheme,
 } from "@react-navigation/native";
 import _ from "lodash";
+import { observer } from "mobx-react-lite";
 import React, { ComponentProps } from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
+import FolderItemsOptions from "./FolderItemsOptions";
 
 function FolderPageHeaderRight({
     tintColor,
 }: {
     tintColor?: string;
 }) {
-    const client = useApolloClient();
     const { colors } = useTheme();
     const route = useRoute<RouteProp<RootStackParamsList>>();
 
@@ -39,29 +40,22 @@ function FolderPageHeaderRight({
     ]);
 
     return (
-        <View className="flex-row gap-x-4 -mr-2.5">
+        <View className="flex-row -mr-2 gap-x-2">
             {items.map((item) => (
-                <Pressable
-                    onPress={() => {
-                        store.auth.signout(client);
-                    }}
+                <IconButton
                     key={item.name}
-                    className="p-1.5 rounded-full"
-                    android_ripple={{
-                        borderless: true,
-                        radius: 20,
-                        color: colors.border,
-                    }}
-                >
-                    <Icon
-                        name={item.icon}
-                        size={24}
-                        color={tintColor}
-                    />
-                </Pressable>
+                    name={item.icon}
+                    size={22}
+                    color={tintColor || colors.text}
+                />
             ))}
+            {route.params?.id && (
+                <FolderItemsOptions
+                    refs={[`Folder:${route.params?.id}`]}
+                />
+            )}
         </View>
     );
 }
 
-export default React.memo(FolderPageHeaderRight);
+export default observer(FolderPageHeaderRight);

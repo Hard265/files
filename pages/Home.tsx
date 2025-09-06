@@ -9,8 +9,9 @@ import FolderList from "@/partials/FolderList";
 import useFolderPage from "@/hooks/useFolderPage";
 import useHeaderScroll from "@/hooks/useHeaderScroll";
 import FolderListHeader from "@/partials/FolderListHeader";
+import { observer } from "mobx-react-lite";
 
-export default function HomePage() {
+function HomePage() {
     const { headerStyle } = useHeaderScroll();
     const { data } = useSuspenseQuery(GetFolderContentsDocument);
 
@@ -27,3 +28,5 @@ export default function HomePage() {
         </View>
     );
 }
+
+export default observer(HomePage);

@@ -13,6 +13,7 @@ import { getGravatarUrl } from "@/utils";
 import { Avatar } from "@/components";
 import _ from "lodash";
 import { PixelRatio } from "react-native";
+import useBackHandler from "./useBackHandler";
 
 const getUrlMemoized = _.memoize(getGravatarUrl);
 
@@ -33,10 +34,22 @@ export default function useFolderPage(id: string | null = null) {
         [],
     );
 
+    const title = useMemo(
+        () => (id !== null ? data?.name : ""),
+        [data?.name, id],
+    );
+
     useFocusEffect(
         useCallback(() => {
             navigation.setOptions({
-                title: id !== null ? data?.name : "",
+                title,
+                /*headerTitle({ children }) {
+                    return (
+                        <View>
+                            <Animated.Text>{children}</Animated.Text>
+                        </View>
+                    );
+                },*/
                 headerLeft:
                     id !== null ? undefined : (
                         async () => {
@@ -56,6 +69,9 @@ export default function useFolderPage(id: string | null = null) {
                     <FolderPageHeaderRight tintColor={tintColor} />
                 ),
             });
-        }, [navigation, id, data?.name, avatarSize]),
+        }, [navigation, title, id, avatarSize]),
     );
+    useBackHandler(store.ui.selectionCount > 0, () => {
+        store.ui.clearSelection();
+    });
 }

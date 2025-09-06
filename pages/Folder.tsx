@@ -11,9 +11,10 @@ import FolderListHeader from "@/partials/FolderListHeader";
 import { RootStackParamsList } from "@/Router";
 import { useSuspenseQuery } from "@apollo/client/react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import {observer} from "mobx-react-lite";
 import { View } from "react-native";
 
-export default function FolderPage({
+function FolderPage({
     route,
 }: NativeStackScreenProps<RootStackParamsList, "Folder">) {
     const { data } = useSuspenseQuery<GetFolderQuery>(
@@ -47,3 +48,5 @@ export default function FolderPage({
         </View>
     );
 }
+
+export default observer(FolderPage);

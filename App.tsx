@@ -10,12 +10,15 @@ import { useFonts } from "expo-font";
 import { setBackgroundColorAsync } from "expo-system-ui";
 import React, { useEffect, useMemo } from "react";
 import { useColorScheme } from "react-native";
-import ErrorBoundary from "./components/ErrorBoundary";
 import client from "./services/client";
 import { MenuProvider } from "react-native-popup-menu";
 import LoadingPage from "./components/LoadingPage";
 import FatalError from "./components/FatalError";
-
+import colors from "tailwindcss/colors";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { PortalHost } from "@rn-primitives/portal";
+import { ErrorBoundary } from "react-error-boundary";
+import { StatusBar } from "expo-status-bar"
 export default function App() {
     const colorSchemeName = useColorScheme();
     const [fontsLoaded, fontsErr] = useFonts({
@@ -25,7 +28,19 @@ export default function App() {
     });
 
     const theme = useMemo(
-        () => (colorSchemeName === "dark" ? DarkTheme : DefaultTheme),
+        () =>
+            colorSchemeName === "dark" ?
+                {
+                    ...DarkTheme,
+                    colors: {
+                        ...DarkTheme.colors,
+                        background: colors.black,
+                        card: colors.neutral[800],
+                        text: colors.neutral[50],
+                        border: colors.neutral[600],
+                    },
+                }
+            :   DefaultTheme,
         [colorSchemeName],
     );
 
@@ -41,11 +56,15 @@ export default function App() {
         <ThemeProvider value={theme}>
             <ErrorBoundary fallback={<FatalError />}>
                 <ApolloProvider client={client}>
-                    <MenuProvider>
-                        <Navigation theme={theme}/>
-                    </MenuProvider>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <MenuProvider>
+                            <Navigation theme={theme} />
+                            <PortalHost name="modal" />
+                        </MenuProvider>
+                    </GestureHandlerRootView>
                 </ApolloProvider>
             </ErrorBoundary>
+            <StatusBar style="auto" />
         </ThemeProvider>
     );
 }

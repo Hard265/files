@@ -18,12 +18,14 @@ type Documents = {
     "query GetFolder($id: UUID!) {\n  folder(id: $id) {\n    ...FolderFields\n  }\n}": typeof types.GetFolderDocument,
     "fragment FileFields on File {\n  id\n  name\n  folderId\n  starred\n  ext\n  size\n  mimeType\n  updatedAt\n  createdAt\n}": typeof types.FileFieldsFragmentDoc,
     "fragment FolderFields on Folder {\n  id\n  name\n  parentId\n  starred\n  updatedAt\n  createdAt\n}": typeof types.FolderFieldsFragmentDoc,
+    "fragment FolderOrFileFields on FolderOrFile {\n  ...FolderFields @unmask\n  ...FileFields @unmask\n}": typeof types.FolderOrFileFieldsFragmentDoc,
 };
 const documents: Documents = {
     "query GetFolderContents($folderId: UUID = null) {\n  folders(folderId: $folderId) {\n    ...FolderFields\n  }\n  files(folderId: $folderId) {\n    ...FileFields\n  }\n}": types.GetFolderContentsDocument,
     "query GetFolder($id: UUID!) {\n  folder(id: $id) {\n    ...FolderFields\n  }\n}": types.GetFolderDocument,
     "fragment FileFields on File {\n  id\n  name\n  folderId\n  starred\n  ext\n  size\n  mimeType\n  updatedAt\n  createdAt\n}": types.FileFieldsFragmentDoc,
     "fragment FolderFields on Folder {\n  id\n  name\n  parentId\n  starred\n  updatedAt\n  createdAt\n}": types.FolderFieldsFragmentDoc,
+    "fragment FolderOrFileFields on FolderOrFile {\n  ...FolderFields @unmask\n  ...FileFields @unmask\n}": types.FolderOrFileFieldsFragmentDoc,
 };
 
 /**
@@ -56,6 +58,10 @@ export function graphql(source: "fragment FileFields on File {\n  id\n  name\n  
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "fragment FolderFields on Folder {\n  id\n  name\n  parentId\n  starred\n  updatedAt\n  createdAt\n}"): (typeof documents)["fragment FolderFields on Folder {\n  id\n  name\n  parentId\n  starred\n  updatedAt\n  createdAt\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "fragment FolderOrFileFields on FolderOrFile {\n  ...FolderFields @unmask\n  ...FileFields @unmask\n}"): (typeof documents)["fragment FolderOrFileFields on FolderOrFile {\n  ...FolderFields @unmask\n  ...FileFields @unmask\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

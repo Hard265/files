@@ -5,16 +5,17 @@ import { Text } from "@/components/Text";
 import store, { ListView, sortFields } from "@/stores";
 import { observer } from "mobx-react-lite";
 import { View } from "react-native";
+import FolderItemsOptions from "./FolderItemsOptions";
 
 function FolderListToolbar() {
     const hasSelection = store.ui.selectionCount > 0;
     const isAscOrder = store.ui.sortField.order === "asc";
 
     return (
-        <View className="flex-row items-center justify-between px-3">
+        <View className="flex-row items-center justify-between px-3 pb-2">
             <View className="flex-row items-center gap-x-4">
                 <Checkbox />
-                <IconButton
+                {/*<IconButton
                     name={
                         isAscOrder ?
                             "sort_ascending_line"
@@ -27,19 +28,28 @@ function FolderListToolbar() {
                             }`,
                         )
                     }
-                />
+                />*/}
                 <SortMenu />
             </View>
-            {hasSelection && (
-                <Text>{store.ui.selectionCount} seleted</Text>
-            )}
-            <ListViewMenu />
+            <View className="flex-row items-center gap-x-4">
+                {hasSelection ?
+                    <>
+                        <Text variant="title3">
+                            {store.ui.selectionCount} selected
+                        </Text>
+                        <FolderItemsOptions
+                            refs={[...store.ui.selectedItems]}
+                        />
+                    </>
+                :   <ListViewMenu />}
+            </View>
         </View>
     );
 }
 
 const SortMenu = observer(() => {
     const onChange = (field: (typeof sortFields)[number]) => {
+        console.log(field);
         store.ui.setSort(`${field}:${store.ui.sortField.order}`);
     };
     return (
@@ -64,7 +74,9 @@ const SortMenu = observer(() => {
                 },
             ]}
         >
-            <Text>Name</Text>
+            <Text className="capitalize">
+                {store.ui.sortField.field}
+            </Text>
         </Popup>
     );
 });
@@ -73,6 +85,7 @@ const ListViewMenu = observer(() => {
     return (
         <Popup
             onChange={(view) => store.ui.setListView(view as any)}
+            title="View as:"
             items={[
                 {
                     label: "Comfortable",
@@ -86,16 +99,7 @@ const ListViewMenu = observer(() => {
                 },
             ]}
         >
-            <IconButton
-                onPress={() =>
-                    store.ui.setListView(
-                        store.ui.isCompact ?
-                            "comfortable"
-                        :   "compact",
-                    )
-                }
-                name="menu_line"
-            />
+            <IconButton name="menu_line" />
         </Popup>
     );
 });

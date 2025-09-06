@@ -32,6 +32,7 @@ export class UIStore {
             sortField: computed,
             setListView: action,
             toggleSelectedItem: action,
+            clearSelection: action,
             setSort: action,
         });
     }
@@ -60,6 +61,10 @@ export class UIStore {
         this.selectedItems = new Set(
             _.xor([...this.selectedItems], [item]),
         );
+    }
+
+    clearSelection() {
+        this.selectedItems = new Set();
     }
 
     setSort(sort: sortOption) {

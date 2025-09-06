@@ -8,6 +8,7 @@ import { RetryLink } from "@apollo/client/link/retry";
 import api from "./api";
 import UploadHttpLink from "apollo-upload-client/UploadHttpLink.mjs"
 import store from "@/stores";
+import Folder from "@/pages/Folder";
 
 const httpLink = new UploadHttpLink({
     isExtractableFile: isReactNativeFile,
@@ -40,7 +41,11 @@ const retryLink = new RetryLink({
 });
 
 const client = new ApolloClient({
-    cache: new InMemoryCache().restore({
+    cache: new InMemoryCache({
+        possibleTypes: {
+            FolderOrFile: ["Folder", "File"],
+        },
+    }).restore({
         "Folder:null": {
             __typename: "Folder",
             id: "null",
