@@ -1,7 +1,7 @@
 import { FolderFieldsFragmentDoc } from "@/graphql/__generated__/graphql";
 import FolderPageHeaderRight from "@/partials/FolderPageHeaderRight";
 import { RootStackParamsList } from "@/Router";
-import { useApolloClient, useSuspenseFragment } from "@apollo/client/react";
+import { useSuspenseFragment } from "@apollo/client/react";
 import {
     useFocusEffect,
     useNavigation,
@@ -9,32 +9,20 @@ import {
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useMemo } from "react";
 import store from "@/stores";
-import { getGravatarUrl } from "@/utils";
-import { Avatar } from "@/components";
-import _ from "lodash";
-import { PixelRatio } from "react-native";
 import useBackHandler from "./useBackHandler";
-import { RectButton } from "react-native-gesture-handler";
-
-const getUrlMemoized = _.memoize(getGravatarUrl);
+import { UserMenu } from "@/components/user-menu";
 
 export default function useFolderPage(id: string | null = null) {
     const navigation =
         useNavigation<
             NativeStackNavigationProp<RootStackParamsList>
         >();
-    const client = useApolloClient();
     const { data } = useSuspenseFragment({
         fragment: FolderFieldsFragmentDoc,
         from: {
             __ref: `Folder:${id}`,
         },
     });
-
-    const avatarSize = useMemo(
-        () => PixelRatio.getPixelSizeForLayoutSize(18),
-        [],
-    );
 
     const title = useMemo(
         () => (id !== null ? data?.name : ""),
@@ -53,27 +41,12 @@ export default function useFolderPage(id: string | null = null) {
                     );
                 },*/
                 headerLeft:
-                    id !== null ? undefined : (
-                        async () => {
-                            if (!store.auth.user) return;
-                            const url = await getUrlMemoized(
-                                store.auth.user.email,
-                            );
-                            return (
-                                <RectButton onPress={() => {store.auth.signout(client)}}>
-                                    <Avatar
-                                        source={{ uri: url }}
-                                        size={avatarSize}
-                                    />
-                                </RectButton>
-                            );
-                        }
-                    ),
+                    id !== null ? undefined : () => <UserMenu />,
                 headerRight: ({ tintColor }) => (
                     <FolderPageHeaderRight tintColor={tintColor} />
                 ),
             });
-        }, [navigation, title, id, avatarSize]),
+        }, [navigation, title, id]),
     );
     useBackHandler(store.ui.selectionCount > 0, () => {
         store.ui.clearSelection();

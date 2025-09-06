@@ -1,7 +1,6 @@
-import {IconButton} from "@/components";
+import { IconButton } from "@/components";
 import Icon from "@/components/Icon";
 import { RootStackParamsList } from "@/Router";
-import store from "@/stores";
 import {
     RouteProp,
     useRoute,
@@ -11,7 +10,7 @@ import _ from "lodash";
 import { observer } from "mobx-react-lite";
 import React, { ComponentProps } from "react";
 import { View } from "react-native";
-import FolderItemsOptions from "./FolderItemsOptions";
+import { ItemsMenu } from "@/components/items-menu";
 
 function FolderPageHeaderRight({
     tintColor,
@@ -19,7 +18,8 @@ function FolderPageHeaderRight({
     tintColor?: string;
 }) {
     const { colors } = useTheme();
-    const route = useRoute<RouteProp<RootStackParamsList>>();
+    const route =
+        useRoute<RouteProp<RootStackParamsList, "Folder">>();
 
     const items: {
         name: string;
@@ -49,11 +49,7 @@ function FolderPageHeaderRight({
                     color={tintColor || colors.text}
                 />
             ))}
-            {route.params?.id && (
-                <FolderItemsOptions
-                    refs={[`Folder:${route.params?.id}`]}
-                />
-            )}
+            {route.params?.id && <ItemsMenu />}
         </View>
     );
 }

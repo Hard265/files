@@ -351,6 +351,17 @@ export {
     Root,
     Trigger,
     useRootContext,
+    CloseProps,
+    CloseRef,
+    ContentProps,
+    ContentRef,
+    OverlayProps,
+    OverlayRef,
+    PortalProps,
+    RootProps,
+    RootRef,
+    TriggerProps,
+    TriggerRef,
 };
 
 function onStartShouldSetResponder() {

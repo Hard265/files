@@ -44,7 +44,7 @@ export default function App() {
                 <GestureHandlerRootView style={{ flex: 1 }}>
                     <MenuProvider>
                         <Navigation theme={theme} />
-                        <PortalHost name="modal" />
+                        <PortalHost />
                     </MenuProvider>
                 </GestureHandlerRootView>
             </ApolloProvider>
