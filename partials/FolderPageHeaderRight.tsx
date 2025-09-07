@@ -9,8 +9,16 @@ import {
 import _ from "lodash";
 import { observer } from "mobx-react-lite";
 import React, { ComponentProps } from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { ItemsMenu } from "@/components/items-menu";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { Text } from "@/components/ui/text";
+import {Separator} from "@/components/ui/separator";
+import {PlusMenu} from "@/components/plus-menu";
 
 function FolderPageHeaderRight({
     tintColor,
@@ -29,10 +37,6 @@ function FolderPageHeaderRight({
             name: "search",
             icon: "search_line",
         },
-        {
-            name: "add",
-            icon: "add_line",
-        },
         route.params?.id && {
             name: "share",
             icon: "user_add_2_line",
@@ -49,7 +53,10 @@ function FolderPageHeaderRight({
                     color={tintColor || colors.text}
                 />
             ))}
-            {route.params?.id && <ItemsMenu />}
+            <PlusMenu />
+            {route.params?.id && (
+                <ItemsMenu refs={[`Folder:${route.params.id}`]} />
+            )}
         </View>
     );
 }

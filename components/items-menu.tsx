@@ -1,6 +1,7 @@
 import { useTheme } from "@react-navigation/native";
 import {
     Popover,
+    PopoverClose,
     PopoverContent,
     PopoverTrigger,
 } from "./ui/popover";
@@ -16,13 +17,28 @@ import {
 import { ComponentProps, memo, Suspense, useState } from "react";
 import { Separator } from "./ui/separator";
 import {
+    DeleteFolderDocument,
     File,
     Folder,
     FolderOrFileFieldsFragmentDoc,
 } from "@/graphql/__generated__/graphql";
-import { useSuspenseFragment } from "@apollo/client/react";
+import {
+    useMutation,
+    useSuspenseFragment,
+} from "@apollo/client/react";
 import { formatBytesIEC } from "@/utils";
 import dayjs from "dayjs";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "./ui/dialog";
+import { Button } from "./ui/button";
 
 interface IItemMenuProps {
     refs: `${NonNullable<(Folder | File)["__typename"]>}:${string}`[];
@@ -40,6 +56,19 @@ const Options = memo(function Options(
             __ref: props.refs[0],
         },
     });
+
+    const [deleteFolder] = useMutation(DeleteFolderDocument, {
+        optimisticResponse: {
+            __typename: "Mutation",
+            deleteFolder: true,
+        },
+        update(cache, { data }) {
+            if (!data?.deleteFolder) return;
+
+            cache.evict({ id: cache.identify(data) });
+        },
+    });
+
     const count = props.refs.length;
 
     const items: ({
@@ -84,23 +113,11 @@ const Options = memo(function Options(
             name: "Move",
             icon: "move_line",
         },
-        {
-            name: "Delete",
-            icon: "delete_3_line",
-        },
-        null,
-        {
-            name: "Report",
-            icon: "flag_2_line",
-        },
-        {
-            name: "Info and activities",
-            icon: "information_line",
-        },
     ];
+
     return (
         <>
-            <Text>
+            <Text className="mb-2">
                 {count > 1 ?
                     `${count} selected`
                 :   (data as any)?.name}
@@ -127,18 +144,82 @@ const Options = memo(function Options(
                             <Text>{item.name}</Text>
                         </Pressable>,
                 )}
+                <PopoverClose asChild>
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Pressable className="flex-row items-center justify-start py-2 gap-x-4">
+                                <Icon
+                                    name="delete_3_line"
+                                    size={18}
+                                    color={colors.text}
+                                />
+                                <Text>Delete</Text>
+                            </Pressable>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Are you sure?
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Lorem ipsum dolor sit amet,
+                                    consectetur adipisicing elit. Sit
+                                    illum ad, sequi et porro corporis
+                                    reprehenderit tenetur eius! Atque,
+                                    minima!
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">
+                                        <Text>Cancel</Text>
+                                    </Button>
+                                </DialogClose>
+                                <Button
+                                    onPress={() =>
+                                        deleteFolder({
+                                            variables: {
+                                                id: (data as any)?.id,
+                                            },
+                                        })
+                                    }
+                                    variant="destructive"
+                                >
+                                    <Text>Delete</Text>
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                </PopoverClose>
+                <Separator orientation="horizontal" />
+                <Pressable className="flex-row items-center justify-start py-2 gap-x-4">
+                    <Icon
+                        name="flag_1_line"
+                        size={18}
+                        color={colors.text}
+                    />
+                    <Text>Report</Text>
+                </Pressable>
+                <Pressable className="flex-row items-center justify-start py-2 gap-x-4">
+                    <Icon
+                        name="information_line"
+                        size={18}
+                        color={colors.text}
+                    />
+                    <Text>Info and activities</Text>
+                </Pressable>
             </ScrollView>
             <Separator orientation="horizontal" />
             {props.refs.length === 1 && (
-                <View className="py-2.5 flex-col gap-y-1 px-4">
-                    <Text variant="small">
+                <View className="flex-col mt-2 gap-y-1">
+                    <Text variant="muted">
                         Created at:{" "}
                         {dayjs((data as any)?.createdAt).format(
                             "DD MMM YYYY HH:mm",
                         )}
                     </Text>
                     {data.__typename === "File" && (
-                        <Text variant="small">
+                        <Text variant="muted">
                             Size:{" "}
                             {formatBytesIEC((data as any)?.size)}
                         </Text>
@@ -155,7 +236,7 @@ export function ItemsMenu(props: IItemMenuProps) {
     return (
         <Popover onOpenChange={(open) => setShown(open)}>
             <PopoverTrigger>
-                <IconButton name="more_2_line" />
+                <IconButton name="more_2_fill" size={22} />
             </PopoverTrigger>
             <PopoverContent className="w-auto">
                 <Suspense fallback={<Text>Loading...</Text>}>

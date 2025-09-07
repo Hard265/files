@@ -1,4 +1,4 @@
-import { ColorValue, Text } from "react-native";
+import { ColorValue, Text, TextProps } from "react-native";
 
 const glyphMap = {
     ABS_fill: 59648,
@@ -3101,13 +3101,18 @@ const glyphMap = {
     zoom_out_line: 62749,
 } as const;
 
-export interface IconProps {
+export interface IconProps extends TextProps {
     name: keyof typeof glyphMap;
     size?: number;
     color?: string | ColorValue;
 }
 
-export default function Icon({ name, size, color }: IconProps) {
+export default function Icon({
+    name,
+    size,
+    color,
+    ...props
+}: IconProps) {
     let glyph = name ? glyphMap[name] || "?" : "";
     if (typeof glyph === "number")
         glyph = String.fromCodePoint(glyph);
@@ -3121,6 +3126,7 @@ export default function Icon({ name, size, color }: IconProps) {
                 color,
                 fontSize: size,
             }}
+            {...props}
         >
             {glyph}
         </Text>

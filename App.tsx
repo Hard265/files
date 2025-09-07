@@ -2,17 +2,18 @@ import "@/global.css";
 import Navigation from "@/Router";
 import { ApolloProvider } from "@apollo/client/react";
 import { ThemeProvider } from "@react-navigation/native";
+import { PortalHost } from "@rn-primitives/portal";
 import * as Font from "expo-font";
+import { StatusBar } from "expo-status-bar";
 import { setBackgroundColorAsync } from "expo-system-ui";
 import React, { useEffect, useMemo, useState } from "react";
 import { useColorScheme } from "react-native";
-import client from "./services/client";
-import LoadingPage from "./components/LoadingPage";
-import FatalError from "./components/FatalError";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { PortalHost } from "@rn-primitives/portal";
-import { StatusBar } from "expo-status-bar";
+import FatalError from "./components/FatalError";
+import LoadingPage from "./components/LoadingPage";
 import { NAV_THEME } from "./lib/theme";
+import client from "./services/client";
+
 export default function App() {
     const colorSchemeName = useColorScheme();
     const [fontsLoaded, setFontsLoaded] = useState(false);

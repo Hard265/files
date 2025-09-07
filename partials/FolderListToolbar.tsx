@@ -1,6 +1,6 @@
 import { IconButton } from "@/components";
 import Checkbox from "@/components/Checkbox";
-import { Text } from "@/components/Text";
+import { Text } from "@/components/ui/text";
 import store, { ListView, sortFields } from "@/stores";
 import { observer } from "mobx-react-lite";
 import { Pressable, View } from "react-native";
@@ -23,7 +23,7 @@ function FolderListToolbar() {
             <View className="flex-row items-center gap-x-4">
                 {hasSelection ?
                     <>
-                        <Text variant="title3">
+                        <Text variant="large">
                             {store.ui.selectionCount} selected
                         </Text>
                         <ItemsMenu
@@ -66,7 +66,7 @@ const SortMenu = observer(() => {
     return (
         <Popover>
             <PopoverTrigger>
-                <Text className="capitalize">
+                <Text variant="large" className="capitalize">
                     {store.ui.sortField.field}
                 </Text>
             </PopoverTrigger>
@@ -79,7 +79,7 @@ const SortMenu = observer(() => {
                     <Pressable
                         onPress={() => onChange(field.value)}
                         key={field.value}
-                        className="px-4 py-2 flex-row items-center gap-x-2"
+                        className="flex-row items-center px-4 py-2 gap-x-2"
                     >
                         <Text>{field.label}</Text>
                     </Pressable>
@@ -105,7 +105,7 @@ const ListViewMenu = observer(() => {
     return (
         <Popover>
             <PopoverTrigger>
-                <IconButton name="more_2_line" />
+                <IconButton name="menu_line" />
             </PopoverTrigger>
             <PopoverContent
                 side="bottom"
@@ -118,7 +118,7 @@ const ListViewMenu = observer(() => {
                             store.ui.setListView(view.value)
                         }
                         key={view.value}
-                        className="px-4 py-2 flex-row items-center gap-x-2"
+                        className="flex-row items-center px-4 py-2 gap-x-2"
                     >
                         <Text>{view.label}</Text>
                     </Pressable>

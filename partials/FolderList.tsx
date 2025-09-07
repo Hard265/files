@@ -2,11 +2,11 @@ import { File, Folder } from "@/graphql/__generated__/graphql";
 import { FlashList, FlashListProps } from "@shopify/flash-list";
 import { Suspense, useCallback } from "react";
 import FolderListItem from "@/partials/FolderListItem";
-import { Text } from "@/components/Text";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamsList } from "@/Router";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Text } from "@/components/ui/text";
 
 interface FolderListProps {
     items: (File | Folder)[];
