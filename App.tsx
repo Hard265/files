@@ -62,6 +62,7 @@ export default function App() {
                 <GestureHandlerRootView style={{ flex: 1 }}>
                     <Navigation theme={theme} />
                     <PortalHost />
+                    <PortalHost name="dialog" />
                 </GestureHandlerRootView>
             </ApolloProvider>
             <StatusBar

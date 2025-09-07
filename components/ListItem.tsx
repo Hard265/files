@@ -33,7 +33,7 @@ export default function ListItem({
     return (
         <View
             className={clsx(
-                "flex-row flex-1 gap-x-2",
+                "flex-row flex-1 gap-x-1",
                 isCompact ? "h-12" : "h-20",
                 hasCheckbox ? "pl-3" : "pl-4",
             )}
@@ -54,7 +54,7 @@ export default function ListItem({
                 onPress={onPress}
                 android_ripple={{ color: colors.border }}
                 className={clsx(
-                    "flex-row rounded-l flex-1 pl-2 pr-4 gap-x-4",
+                    "flex-row rounded-l flex-1 pl-2 pr-4 gap-x-2",
                     isCompact ? "items-center" : "pt-2 items-start",
                 )}
             >

@@ -20,7 +20,7 @@ export default function Checkbox(props: CheckboxProps) {
         >
             <View
                 className={clsx([
-                    "size-6 items-center justify-center rounded border",
+                    "size-5 items-center justify-center rounded border",
                     "border-neutral-300 bg-neutral-200 dark:border-neutral-700 dark:bg-neutral-800",
                     props.checked
                         && "border-transparent bg-primary dark:border-transparent dark:!bg-neutral-600 dark:bg-neutral-800",

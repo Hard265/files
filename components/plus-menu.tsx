@@ -6,6 +6,7 @@ import {
     Popover,
     PopoverTrigger,
     PopoverContent,
+    PopoverClose,
 } from "./ui/popover";
 import { Separator } from "./ui/separator";
 import { Text } from "./ui/text";
@@ -26,31 +27,37 @@ export function PlusMenu() {
                 align="end"
                 className="w-auto p-0"
             >
-                <Pressable className="flex-row items-center px-4 py-2 gap-x-4">
-                    <Icon
-                        name="file_upload_line"
-                        size={18}
-                        color={colors.text}
-                    />
-                    <Text>Upload file</Text>
-                </Pressable>
-                <Pressable className="flex-row items-center px-4 py-2 gap-x-4">
-                    <Icon
-                        name="camera_2_line"
-                        size={18}
-                        color={colors.text}
-                    />
-                    <Text>Take a photo</Text>
-                </Pressable>
+                <PopoverClose asChild>
+                    <Pressable className="flex-row items-center px-4 py-2 gap-x-4">
+                        <Icon
+                            name="file_upload_line"
+                            size={18}
+                            color={colors.text}
+                        />
+                        <Text>Upload file</Text>
+                    </Pressable>
+                </PopoverClose>
+                <PopoverClose asChild>
+                    <Pressable className="flex-row items-center px-4 py-2 gap-x-4">
+                        <Icon
+                            name="camera_2_line"
+                            size={18}
+                            color={colors.text}
+                        />
+                        <Text>Take a photo</Text>
+                    </Pressable>
+                </PopoverClose>
                 <Separator />
-                <Pressable className="flex-row items-center px-4 py-2 gap-x-4">
-                    <Icon
-                        name="new_folder_line"
-                        size={18}
-                        color={colors.text}
-                    />
-                    <Text>Create a new folder</Text>
-                </Pressable>
+                <PopoverClose asChild>
+                    <Pressable className="flex-row items-center px-4 py-2 gap-x-4">
+                        <Icon
+                            name="new_folder_line"
+                            size={18}
+                            color={colors.text}
+                        />
+                        <Text>Create a new folder</Text>
+                    </Pressable>
+                </PopoverClose>
             </PopoverContent>
         </Popover>
     );

@@ -7,6 +7,7 @@ import { Pressable, View } from "react-native";
 import { ItemsMenu } from "@/components/items-menu";
 import {
     Popover,
+    PopoverClose,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
@@ -72,17 +73,27 @@ const SortMenu = observer(() => {
             </PopoverTrigger>
             <PopoverContent
                 side="bottom"
-                align="end"
-                className="w-auto"
+                align="start"
+                className="w-auto p-0"
             >
                 {fields.map((field) => (
-                    <Pressable
-                        onPress={() => onChange(field.value)}
-                        key={field.value}
-                        className="flex-row items-center px-4 py-2 gap-x-2"
-                    >
-                        <Text>{field.label}</Text>
-                    </Pressable>
+                    <PopoverClose asChild key={field.value}>
+                        <Pressable
+                            onPress={() => onChange(field.value)}
+                            className="flex-row items-center justify-between px-4 py-2 gap-x-2"
+                        >
+                            <Text>{field.label}</Text>
+                            <View className="-my-2 -mr-2 size-8">
+                                {store.ui.sortField.field
+                                    === field.value && (
+                                    <IconButton
+                                        name="check_line"
+                                        size={18}
+                                    />
+                                )}
+                            </View>
+                        </Pressable>
+                    </PopoverClose>
                 ))}
             </PopoverContent>
         </Popover>
@@ -105,23 +116,32 @@ const ListViewMenu = observer(() => {
     return (
         <Popover>
             <PopoverTrigger>
-                <IconButton name="menu_line" />
+                <IconButton name="menu_line" size={22} />
             </PopoverTrigger>
             <PopoverContent
                 side="bottom"
                 align="end"
-                className="w-auto"
+                className="w-auto p-0"
             >
                 {list.map((view) => (
-                    <Pressable
-                        onPress={() =>
-                            store.ui.setListView(view.value)
-                        }
-                        key={view.value}
-                        className="flex-row items-center px-4 py-2 gap-x-2"
-                    >
-                        <Text>{view.label}</Text>
-                    </Pressable>
+                    <PopoverClose asChild key={view.value}>
+                        <Pressable
+                            onPress={() =>
+                                store.ui.setListView(view.value)
+                            }
+                            className="flex-row items-center justify-between px-4 py-2 gap-x-4"
+                        >
+                            <Text>{view.label}</Text>
+                            <View className="-my-2 -mr-2 size-8">
+                                {store.ui.listView === view.value && (
+                                    <IconButton
+                                        name="check_line"
+                                        size={18}
+                                    />
+                                )}
+                            </View>
+                        </Pressable>
+                    </PopoverClose>
                 ))}
             </PopoverContent>
         </Popover>

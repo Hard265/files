@@ -69,12 +69,12 @@ function FolderListItem({
                 type === "Folder" ?
                     <Icon
                         name="folder_3_fill"
-                        size={26}
+                        size={24}
                         color={"orange"}
                     />
                 :   <Icon
                         name="document_3_line"
-                        size={26}
+                        size={24}
                         color={colors.text}
                     />
             }

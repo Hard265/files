@@ -1,30 +1,28 @@
-import {
-    File,
-    Folder,
-    GetFolderContentsDocument,
-} from "@/graphql/__generated__/graphql";
-import { useSuspenseQuery } from "@apollo/client/react";
 import { View } from "react-native";
-import FolderList from "@/partials/FolderList";
 import useFolderPage from "@/hooks/useFolderPage";
-import useHeaderScroll from "@/hooks/useHeaderScroll";
-import FolderListHeader from "@/partials/FolderListHeader";
 import { observer } from "mobx-react-lite";
+import FolderContents from "@/components/folder-contents";
+import { Suspense } from "react";
+import { Text } from "@/components/ui/text";
+import FolderListHeader from "@/partials/FolderListHeader";
+import {FolderContentsSkeleton} from "@/components/folder-contents-skeleton";
 
 function HomePage() {
-    const { headerStyle } = useHeaderScroll();
-    const { data } = useSuspenseQuery(GetFolderContentsDocument);
-
-    const items = [...data.folders, ...data.files] as (
-        | File
-        | Folder
-    )[];
-
     useFolderPage(null);
     return (
         <View className="flex-1">
-            <FolderListHeader />
-            <FolderList items={items} />
+            <Suspense
+                fallback={
+                    <View className="items-center justify-center flex-1">
+                        <Text>Loading...</Text>
+                    </View>
+                }
+            >
+                <FolderListHeader />
+            </Suspense>
+            <Suspense fallback={<FolderContentsSkeleton />}>
+                <FolderContents />
+            </Suspense>
         </View>
     );
 }

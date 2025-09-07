@@ -9,22 +9,11 @@ import {
 import _ from "lodash";
 import { observer } from "mobx-react-lite";
 import React, { ComponentProps } from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { ItemsMenu } from "@/components/items-menu";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { Text } from "@/components/ui/text";
-import {Separator} from "@/components/ui/separator";
-import {PlusMenu} from "@/components/plus-menu";
+import { PlusMenu } from "@/components/plus-menu";
 
-function FolderPageHeaderRight({
-    tintColor,
-}: {
-    tintColor?: string;
-}) {
+function FolderHeaderRight({ tintColor }: { tintColor?: string }) {
     const { colors } = useTheme();
     const route =
         useRoute<RouteProp<RootStackParamsList, "Folder">>();
@@ -61,4 +50,4 @@ function FolderPageHeaderRight({
     );
 }
 
-export default observer(FolderPageHeaderRight);
+export default observer(FolderHeaderRight);

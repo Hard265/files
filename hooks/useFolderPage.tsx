@@ -1,5 +1,4 @@
 import { FolderFieldsFragmentDoc } from "@/graphql/__generated__/graphql";
-import FolderPageHeaderRight from "@/partials/FolderPageHeaderRight";
 import { RootStackParamsList } from "@/Router";
 import { useSuspenseFragment } from "@apollo/client/react";
 import {
@@ -11,6 +10,7 @@ import { useCallback, useMemo } from "react";
 import store from "@/stores";
 import useBackHandler from "./useBackHandler";
 import { UserMenu } from "@/components/user-menu";
+import FolderHeaderRight from "@/components/folder-header-right";
 
 export default function useFolderPage(id: string | null = null) {
     const navigation =
@@ -43,7 +43,7 @@ export default function useFolderPage(id: string | null = null) {
                 headerLeft:
                     id !== null ? undefined : () => <UserMenu />,
                 headerRight: ({ tintColor }) => (
-                    <FolderPageHeaderRight tintColor={tintColor} />
+                    <FolderHeaderRight tintColor={tintColor} />
                 ),
             });
         }, [navigation, title, id]),
