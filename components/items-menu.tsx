@@ -1,322 +1,287 @@
 import { useTheme } from "@react-navigation/native";
-import {
-    Popover,
-    PopoverClose,
-    PopoverContent,
-    PopoverTrigger,
-} from "./ui/popover";
 import { Text } from "./ui/text";
 import { IconButton } from "./Button";
 import Icon from "./Icon";
+import { ScrollView, View, ActivityIndicator } from "react-native";
 import {
-    Pressable,
-    ScrollView,
-    useWindowDimensions,
-    View,
-} from "react-native";
-import { memo, Suspense, useState } from "react";
+    memo,
+    Suspense,
+    useState,
+    ComponentProps,
+    useMemo,
+} from "react";
 import { Separator } from "./ui/separator";
 import {
-    DeleteFolderDocument,
     File,
     Folder,
     FolderOrFileFieldsFragmentDoc,
 } from "@/graphql/__generated__/graphql";
-import {
-    useMutation,
-    useSuspenseFragment,
-} from "@apollo/client/react";
+import { useSuspenseFragment } from "@apollo/client/react";
 import { formatBytesIEC } from "@/utils";
 import dayjs from "dayjs";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import _ from "lodash";
 
-interface IItemMenuProps {
+interface ItemsMenuProps {
     refs: `${NonNullable<(Folder | File)["__typename"]>}:${string}`[];
+    onAction?: (action: string, refs: ItemsMenuProps["refs"]) => void;
 }
 
-const Options = memo(function Options(
-    props: Pick<IItemMenuProps, "refs">,
-) {
+type MenuItemConfig = {
+    id: string;
+    label: string;
+    icon: ComponentProps<typeof Icon>["name"];
+    action: string;
+    display: "always" | "single";
+};
+
+// --- Reusable MenuItem Component ---
+const MenuItem = memo(function MenuItem({
+    label,
+    icon,
+    onPress,
+}: {
+    label: string;
+    icon: ComponentProps<typeof Icon>["name"];
+    onPress: () => void;
+}) {
     const { colors } = useTheme();
-    const dimensions = useWindowDimensions();
+    return (
+        <DropdownMenuItem asChild>
+            <View>
+                <Icon name={icon} size={20} color={colors.text} />
+                <Text>{label}</Text>
+            </View>
+        </DropdownMenuItem>
+    );
+});
+
+// --- Menu Configuration Array ---
+const menuConfig: MenuItemConfig[][] = [
+    [
+        {
+            id: "share",
+            label: "Share",
+            icon: "user_add_2_line",
+            action: "share",
+            display: "always",
+        },
+        {
+            id: "manage-access",
+            label: "Manage access",
+            icon: "group_2_line",
+            action: "manageAccess",
+            display: "single",
+        },
+        {
+            id: "star",
+            label: "Add to starred",
+            icon: "star_line",
+            action: "star",
+            display: "always",
+        },
+        {
+            id: "offline",
+            label: "Make available offline",
+            icon: "wifi_off_line",
+            action: "offline",
+            display: "always",
+        },
+    ],
+    [
+        {
+            id: "copy-link",
+            label: "Copy link",
+            icon: "link_2_line",
+            action: "copyLink",
+            display: "single",
+        },
+        {
+            id: "make-copy",
+            label: "Make a copy",
+            icon: "copy_2_line",
+            action: "makeCopy",
+            display: "always",
+        },
+        {
+            id: "send-copy",
+            label: "Send a copy",
+            icon: "forward_2_line",
+            action: "sendCopy",
+            display: "always",
+        },
+    ],
+    [
+        {
+            id: "download",
+            label: "Download",
+            icon: "download_2_line",
+            action: "download",
+            display: "always",
+        },
+        {
+            id: "rename",
+            label: "Rename",
+            icon: "edit_2_line",
+            action: "rename",
+            display: "single",
+        },
+        {
+            id: "move",
+            label: "Move",
+            icon: "file_export_line",
+            action: "move",
+            display: "always",
+        },
+        {
+            id: "delete",
+            label: "Delete",
+            icon: "delete_3_line",
+            action: "delete",
+            display: "always",
+        },
+    ],
+    [
+        {
+            id: "report",
+            label: "Report",
+            icon: "flag_1_line",
+            action: "report",
+            display: "always",
+        },
+        {
+            id: "info",
+            label: "Info and activities",
+            icon: "information_line",
+            action: "info",
+            display: "single",
+        },
+    ],
+];
+
+// --- Improved Options Component ---
+const Options = memo(function Options({
+    refs,
+    onAction,
+}: ItemsMenuProps) {
     const { data } = useSuspenseFragment({
         fragment: FolderOrFileFieldsFragmentDoc,
         fragmentName: "FolderOrFileFields",
-        from: {
-            __ref: props.refs[0],
-        },
-    });
+        from: { __ref: refs[0] },
+    }) as any;
 
-    const [deleteFolder] = useMutation(DeleteFolderDocument, {
-        optimisticResponse: {
-            __typename: "Mutation",
-            deleteFolder: true,
-        },
-        update(cache, { data }) {
-            if (!data?.deleteFolder) return;
-            cache.evict({
-                id: cache.identify({
-                    __ref: props.refs[0],
-                }),
-            });
-            cache.gc();
-        },
-    });
-
-    const count = props.refs.length;
+    const count = refs.length;
     const isMultiple = count > 1;
+
+    // Determine which menu items to render based on selection count.
+    const visibleItems = useMemo(
+        () =>
+            !isMultiple ? menuConfig : (
+                _.map(menuConfig, (group) =>
+                    _.reject(group, {
+                        display: "single",
+                    }),
+                )
+            ),
+        [isMultiple],
+    );
 
     return (
         <>
-            <View className="flex-1">
-                <Text
-                    numberOfLines={1}
-                    ellipsizeMode="middle"
-                    className="px-4 py-2.5"
-                >
-                    {count > 1 ?
-                        `${count} selected`
-                    :   (data as any)?.name}
-                </Text>
-            </View>
-            <Separator orientation="horizontal" />
-            <ScrollView indicatorClassName="bg-muted">
-                <PopoverClose asChild>
-                    <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                        <Icon
-                            name="user_add_2_line"
-                            size={18}
-                            color={colors.text}
-                        />
-                        <Text>Share</Text>
-                    </Pressable>
-                </PopoverClose>
-                {!isMultiple && (
-                    <PopoverClose asChild>
-                        <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                            <Icon
-                                name="group_2_line"
-                                size={18}
-                                color={colors.text}
+            <DropdownMenuLabel>
+                {isMultiple ? `${count} selected` : data?.name}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {visibleItems.map((group, index) => (
+                <>
+                    <DropdownMenuGroup key={index}>
+                        {group.map((item) => (
+                            <MenuItem
+                                key={item.id}
+                                label={item.label}
+                                icon={item.icon}
+                                onPress={() =>
+                                    onAction?.(item.action, refs)
+                                }
                             />
-                            <Text>Manage access</Text>
-                        </Pressable>
-                    </PopoverClose>
-                )}
-                <PopoverClose asChild>
-                    <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                        <Icon
-                            name="star_line"
-                            size={18}
-                            color={colors.text}
-                        />
-                        <Text>Add to starred</Text>
-                    </Pressable>
-                </PopoverClose>
-                <PopoverClose asChild>
-                    <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                        <Icon
-                            name="wifi_off_line"
-                            size={18}
-                            color={colors.text}
-                        />
-                        <Text>Make available offline</Text>
-                    </Pressable>
-                </PopoverClose>
-                <Separator orientation="horizontal" />
-                {!isMultiple && (
-                    <PopoverClose asChild>
-                        <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                            <Icon
-                                name="link_2_line"
-                                size={18}
-                                color={colors.text}
-                            />
-                            <Text>Copy link</Text>
-                        </Pressable>
-                    </PopoverClose>
-                )}
-                <PopoverClose asChild>
-                    <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                        <Icon
-                            name="copy_2_line"
-                            size={18}
-                            color={colors.text}
-                        />
-                        <Text>Make a copy</Text>
-                    </Pressable>
-                </PopoverClose>
-                <PopoverClose asChild>
-                    <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                        <Icon
-                            name="forward_2_line"
-                            size={18}
-                            color={colors.text}
-                        />
-                        <Text>Send a copy</Text>
-                    </Pressable>
-                </PopoverClose>
-                <Separator orientation="horizontal" />
-                <PopoverClose asChild>
-                    <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                        <Icon
-                            name="download_2_line"
-                            size={18}
-                            color={colors.text}
-                        />
-                        <Text>Download</Text>
-                    </Pressable>
-                </PopoverClose>
-                {!isMultiple && (
-                    <PopoverClose asChild>
-                        <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                            <Icon
-                                name="edit_2_line"
-                                size={18}
-                                color={colors.text}
-                            />
-                            <Text>Rename</Text>
-                        </Pressable>
-                    </PopoverClose>
-                )}
-                <PopoverClose asChild>
-                    <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                        <Icon
-                            name="file_export_line"
-                            size={18}
-                            color={colors.text}
-                        />
-                        <Text>Move</Text>
-                    </Pressable>
-                </PopoverClose>
-                <PopoverClose asChild>
-                    <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                        <Icon
-                            name="delete_3_line"
-                            size={18}
-                            color={colors.text}
-                        />
-                        <Text>Delete</Text>
-                    </Pressable>
-                </PopoverClose>
-                <Separator orientation="horizontal" />
-                <PopoverClose asChild>
-                    <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                        <Icon
-                            name="flag_1_line"
-                            size={18}
-                            color={colors.text}
-                        />
-                        <Text>Report</Text>
-                    </Pressable>
-                </PopoverClose>
-                {!isMultiple && (
-                    <PopoverClose asChild>
-                        <Pressable className="flex-row items-center justify-start px-4 py-2.5 gap-x-4">
-                            <Icon
-                                name="information_line"
-                                size={18}
-                                color={colors.text}
-                            />
-                            <Text>Info and activities</Text>
-                        </Pressable>
-                    </PopoverClose>
-                )}
-            </ScrollView>
-            <Separator orientation="horizontal" />
-            {props.refs.length === 1 && (
-                <View className="flex-col px-4 py-2.5 gap-y-1">
-                    <Text variant="muted">
-                        Created at:{" "}
-                        {dayjs((data as any)?.createdAt).format(
-                            "DD MMM YYYY HH:mm",
-                        )}
-                    </Text>
-                    {data.__typename === "File" && (
+                        ))}
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                </>
+            ))}
+            {!isMultiple && data && (
+                <>
+                    <View className="flex-col p-2 gap-y-1">
                         <Text variant="muted">
-                            Size:{" "}
-                            {formatBytesIEC((data as any)?.size)}
+                            Created at:{" "}
+                            {dayjs(data.createdAt).format(
+                                "DD MMM YYYY HH:mm",
+                            )}
                         </Text>
-                    )}
-                </View>
+                        {data.__typename === "File" && (
+                            <Text variant="muted">
+                                Size: {formatBytesIEC(data.size)}
+                            </Text>
+                        )}
+                    </View>
+                </>
             )}
         </>
     );
 });
 
-export function ItemsMenu(props: IItemMenuProps) {
+// --- Suspense Fallback Component ---
+const LoadingState = () => (
+    <View className="items-center justify-center w-40 h-40">
+        <ActivityIndicator />
+    </View>
+);
+
+export function ItemsMenu(props: ItemsMenuProps) {
     const [shown, setShown] = useState(false);
+    const insets = useSafeAreaInsets();
+    const contentInsets = {
+        top: insets.top,
+        bottom: insets.bottom,
+        left: 4,
+        right: 4,
+    };
+    // Avoid rendering the popover content unless it's needed.
+    const shouldRenderContent = props.refs.length > 0 && shown;
 
     return (
-        <>
-            <Popover onOpenChange={(open) => setShown(open)}>
-                <PopoverTrigger>
-                    <IconButton name="more_2_fill" size={22} />
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                    <Suspense fallback={<Text>Loadiing...</Text>}>
-                        {props.refs.length > 0 && (
-                            <Options refs={props.refs} />
-                        )}
-                    </Suspense>
-                </PopoverContent>
-            </Popover>
-            <Dialog>
-                <DialogContent portalHost="dialog">
-                    <DialogHeader>
-                        <DialogTitle>
-                            Delete{" "}
-                            {isMultiple ?
-                                `${count} items`
-                            :   _.lowerCase(data.__typename)}
-                            ?
-                        </DialogTitle>
-                        <DialogDescription>
-                            This will delete{" "}
-                            <Text className="font-medium">
-                                {isMultiple ?
-                                    `${count} items`
-                                :   (data as any)?.name}
-                            </Text>
-                            . This action cannot be undone.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">
-                                <Text>Cancel</Text>
-                            </Button>
-                        </DialogClose>
-                        <DialogClose asChild>
-                            <Button
-                                onPress={() => {
-                                    alert((data as any)?.id);
-                                    if (data.__typename === "Folder")
-                                        deleteFolder({
-                                            variables: {
-                                                id: (data as any)?.id,
-                                            },
-                                        });
-                                }}
-                                variant="destructive"
-                            >
-                                <Text>Delete</Text>
-                            </Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </>
+        <DropdownMenu onOpenChange={setShown}>
+            <DropdownMenuTrigger>
+                <IconButton name="more_2_fill" size={22} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+                insets={contentInsets}
+                side="bottom"
+                className="w-auto"
+                align="end"
+            >
+                <Suspense fallback={<LoadingState />}>
+                    {shouldRenderContent && (
+                        <Options
+                            refs={props.refs}
+                            onAction={props.onAction}
+                        />
+                    )}
+                </Suspense>
+            </DropdownMenuContent>
+        </DropdownMenu>
     );
 }

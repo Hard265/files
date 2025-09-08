@@ -1,8 +1,8 @@
 query GetFolderContents($folderId: UUID = null) {
     folders(folderId: $folderId) {
-        ... FolderFields
+        ... FolderFields @defer 
     } 
     files(folderId: $folderId) {
-        ... FileFields
+        ... FileFields @defer
     }
 }

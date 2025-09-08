@@ -1,3 +1,4 @@
+import {useTheme} from "@react-navigation/native";
 import { ColorValue, Text, TextProps } from "react-native";
 
 const glyphMap = {
@@ -3113,6 +3114,8 @@ export default function Icon({
     color,
     ...props
 }: IconProps) {
+    const { colors } = useTheme();
+    color = color || colors.text;
     let glyph = name ? glyphMap[name] || "?" : "";
     if (typeof glyph === "number")
         glyph = String.fromCodePoint(glyph);

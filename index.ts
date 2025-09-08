@@ -1,8 +1,10 @@
-import { registerRootComponent } from 'expo';
+import { registerRootComponent } from "expo";
+import { polyfill as polyfillEncoding } from "react-native-polyfill-globals/src/encoding";
+import { polyfill as polyfillReadableStream } from "react-native-polyfill-globals/src/readable-stream";
+import { polyfill as polyfillFetch } from "react-native-polyfill-globals/src/fetch";
+import App from "./App";
+polyfillReadableStream();
+polyfillEncoding();
+polyfillFetch();
 
-import App from './App';
-
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
 registerRootComponent(App);

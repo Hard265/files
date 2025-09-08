@@ -1,0 +1,11 @@
+diff --git a/node_modules/apollo-link-multipart/dist/index.mjs b/node_modules/apollo-link-multipart/dist/index.mjs
+index 4802dd4..faa6916 100644
+--- a/node_modules/apollo-link-multipart/dist/index.mjs
++++ b/node_modules/apollo-link-multipart/dist/index.mjs
+@@ -1,5 +1,5 @@
+ import { Observable } from '@apollo/client/core';
+-import { ApolloLink } from '@apollo/client/link/core';
++import { ApolloLink } from '@apollo/client';
+ import { checkFetcher, selectURI, selectHttpOptionsAndBody, fallbackHttpConfig, serializeFetchParameter, parseAndCheckHttpResponse } from '@apollo/client/link/http';
+ import deepmerge from 'deepmerge';
+ import { meros } from 'meros';

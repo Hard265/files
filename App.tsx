@@ -13,6 +13,7 @@ import FatalError from "./components/FatalError";
 import LoadingPage from "./components/LoadingPage";
 import { NAV_THEME } from "./lib/theme";
 import client from "./services/client";
+import { UIProvider } from "./providers/UIProvider";
 
 export default function App() {
     const colorSchemeName = useColorScheme();
@@ -60,9 +61,10 @@ export default function App() {
         <ThemeProvider value={theme}>
             <ApolloProvider client={client}>
                 <GestureHandlerRootView style={{ flex: 1 }}>
-                    <Navigation theme={theme} />
-                    <PortalHost />
-                    <PortalHost name="dialog" />
+                    <UIProvider>
+                        <Navigation theme={theme} />
+                        <PortalHost />
+                    </UIProvider>
                 </GestureHandlerRootView>
             </ApolloProvider>
             <StatusBar

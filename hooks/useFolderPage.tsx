@@ -1,6 +1,6 @@
-import { FolderFieldsFragmentDoc } from "@/graphql/__generated__/graphql";
+import { DeleteFolderDocument, FolderFieldsFragmentDoc } from "@/graphql/__generated__/graphql";
 import { RootStackParamsList } from "@/Router";
-import { useSuspenseFragment } from "@apollo/client/react";
+import { useMutation, useSuspenseFragment } from "@apollo/client/react";
 import {
     useFocusEffect,
     useNavigation,
@@ -23,6 +23,34 @@ export default function useFolderPage(id: string | null = null) {
             __ref: `Folder:${id}`,
         },
     });
+    const [deleteFolder] = useMutation(DeleteFolderDocument, {
+        optimisticResponse: {
+            __typename: "Mutation",
+            deleteFolder: true,
+        },
+        update(cache, { data }, { variables }) {
+            if (data?.deleteFolder) {
+                cache.evict({
+                    id: cache.identify({
+                        __ref: `Folder:${variables?.id}`,
+                    }),
+                });
+            }
+        },
+    });
+
+    const ops = useMemo(
+        () => ({
+            delete(refs: string[]) {
+                deleteFolder({
+                    variables: {
+                        id: refs[0].split(":")[1],
+                    },
+                });
+            },
+        }),
+        [deleteFolder],
+    );
 
     const title = useMemo(
         () => (id !== null ? data?.name : ""),
@@ -33,13 +61,6 @@ export default function useFolderPage(id: string | null = null) {
         useCallback(() => {
             navigation.setOptions({
                 title,
-                /*headerTitle({ children }) {
-                    return (
-                        <View>
-                            <Animated.Text>{children}</Animated.Text>
-                        </View>
-                    );
-                },*/
                 headerLeft:
                     id !== null ? undefined : () => <UserMenu />,
                 headerRight: ({ tintColor }) => (
@@ -51,4 +72,9 @@ export default function useFolderPage(id: string | null = null) {
     useBackHandler(store.ui.selectionCount > 0, () => {
         store.ui.clearSelection();
     });
+
+    return {
+        id,
+        ops,
+    };
 }

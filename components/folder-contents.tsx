@@ -5,7 +5,7 @@ import {
 } from "@/graphql/__generated__/graphql";
 import FolderListItem from "@/partials/FolderListItem";
 import { useSuspenseQuery } from "@apollo/client/react";
-import { FlashList } from "@shopify/flash-list";
+import { AnimatedFlashList as FlashList } from "@shopify/flash-list";
 import { Suspense, useCallback, startTransition } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import {
@@ -18,7 +18,6 @@ import { RootStackParamsList } from "@/Router";
 import { Text } from "./ui/text";
 import useHeaderScroll from "@/hooks/useHeaderScroll";
 import { RefreshControl, View } from "react-native";
-import FolderListHeader from "@/partials/FolderListHeader";
 
 function FolderContents() {
     const route =
@@ -84,8 +83,6 @@ function FolderContents() {
                 data={items}
                 renderItem={render}
                 refreshControl={renderRefreshControl()}
-                estimatedItemSize={50}
-                onScroll={onScroll}
                 keyExtractor={(item) => item.id}
             />
         </View>

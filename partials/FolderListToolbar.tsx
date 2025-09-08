@@ -11,9 +11,49 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
+import { useUI } from "@/providers/UIProvider";
+import { useFolderOp } from "@/providers/FolderOpProvider";
+import { useCallback } from "react";
+import { useApolloClient } from "@apollo/client/react";
+import { FolderOrFileFieldsFragmentDoc } from "@/graphql/__generated__/graphql";
+import _ from "lodash";
 
 function FolderListToolbar() {
     const hasSelection = store.ui.selectionCount > 0;
+    const { openDialog } = useUI();
+    const folderOp = useFolderOp();
+    const client = useApolloClient();
+
+    const deleteHandler = useCallback(() => {
+        const data = client.cache.readFragment({
+            fragment: FolderOrFileFieldsFragmentDoc,
+            fragmentName: "FolderOrFileFields",
+            id: [...store.ui.selectedItems][0],
+        });
+        openDialog({
+            title:
+                store.ui.selectionCount === 1 ?
+                    `Delete ${data?.name}`
+                :   `Delete ${store.ui.selectionCount} items`,
+            message: (
+                <>
+                    Are you sure you want to delete
+                    <Text>
+                        {" "}
+                        {store.ui.selectionCount === 1 ?
+                            data?.name
+                        :   `${store.ui.selectionCount} items`}
+                    </Text>
+                    ? This action cannot be undone.
+                </>
+            ),
+            cancelText: "Cancel",
+            confirmText: "Delete",
+            onConfirm: () => {
+                folderOp.delete?.([...store.ui.selectedItems]);
+            },
+        });
+    }, [client.cache, folderOp, openDialog]);
 
     return (
         <View className="flex-row items-center justify-between px-3 pb-2">
@@ -21,12 +61,17 @@ function FolderListToolbar() {
                 <Checkbox />
                 <SortMenu />
             </View>
-            <View className="flex-row items-center gap-x-4">
+            <View className="flex-row items-center gap-x-2">
                 {hasSelection ?
                     <>
-                        <Text variant="large">
+                        <Text variant="large" className="mr-2.5">
                             {store.ui.selectionCount} selected
                         </Text>
+                        <IconButton
+                            onPress={deleteHandler}
+                            name="delete_2_line"
+                            size={22}
+                        />
                         <ItemsMenu
                             refs={[...store.ui.selectedItems]}
                         />
