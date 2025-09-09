@@ -14,15 +14,15 @@ const textVariants = cva(
     {
         variants: {
             variant: {
-                default: "",
+                default: "font-[NeueMontrealBook]",
                 h1: cn(
-                    "text-center text-4xl font-extrabold tracking-tight",
+                    "text-center text-4xl font-extrabold font-[NeueMontrealBold] tracking-tight",
                     Platform.select({
                         web: "scroll-m-20 text-balance",
                     }),
                 ),
                 h2: cn(
-                    "border-border border-b pb-2 text-3xl font-semibold tracking-tight",
+                    "border-border border-b pb-2 text-3xl font-semibold font-[NeueMontrealBold] tracking-tight",
                     Platform.select({
                         web: "scroll-m-20 first:mt-0",
                     }),
@@ -35,7 +35,7 @@ const textVariants = cva(
                     "text-xl font-semibold tracking-tight",
                     Platform.select({ web: "scroll-m-20" }),
                 ),
-                p: "mt-3 leading-7 sm:mt-6",
+                p: "mt-3 leading-7 sm:mt-6 font-[NeueMontrealMedium]",
                 blockquote:
                     "mt-4 border-l-2 pl-3 italic sm:mt-6 sm:pl-6",
                 code: cn(

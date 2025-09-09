@@ -1,4 +1,5 @@
 import FolderContents from "@/components/folder-contents";
+import { FolderContentsHeader } from "@/components/folder-contents-header";
 import { FolderContentsSkeleton } from "@/components/folder-contents-skeleton";
 import { Text } from "@/components/ui/text";
 import {
@@ -6,7 +7,6 @@ import {
     GetFolderQuery,
 } from "@/graphql/__generated__/graphql";
 import useFolderPage from "@/hooks/useFolderPage";
-import FolderListHeader from "@/partials/FolderListHeader";
 import { FolderOpProvider } from "@/providers/FolderOpProvider";
 import { RootStackParamsList } from "@/Router";
 import { useSuspenseQuery } from "@apollo/client/react";
@@ -34,7 +34,7 @@ function FolderPage({
                         </View>
                     }
                 >
-                    <FolderListHeader />
+                    <FolderContentsHeader />
                 </Suspense>
                 <Suspense fallback={<FolderContentsSkeleton />}>
                     <FolderContents />

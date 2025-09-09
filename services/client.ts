@@ -4,6 +4,7 @@ import {
     ApolloClient,
     InMemoryCache,
     HttpLink,
+    Cache,
 } from "@apollo/client";
 import { RetryLink } from "@apollo/client/link/retry";
 import api from "./api";
@@ -53,7 +54,20 @@ const retryLink = new RetryLink({
     },
 });
 
-const cache = new InMemoryCache({
+class CustomInMemoryCache extends InMemoryCache {
+    evict(options: Cache.EvictOptions): boolean {
+        const result = super.evict(options);
+        if (result) {
+            // Perform any additional cleanup or state updates here
+            (options.id?.startsWith("Folder:")
+                || options.id?.startsWith("File:"))
+                && store.ui.clearSelection();
+        }
+        return result;
+    }
+}
+
+const cache = new CustomInMemoryCache({
     possibleTypes: {
         FolderOrFile: ["Folder", "File"],
     },

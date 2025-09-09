@@ -4,56 +4,25 @@ import { Text } from "@/components/ui/text";
 import store, { ListView, sortFields } from "@/stores";
 import { observer } from "mobx-react-lite";
 import { Pressable, View } from "react-native";
-import { ItemsMenu } from "@/components/items-menu";
+import { ItemsMenu } from "@/components/folder-contents-items-menu";
 import {
     Popover,
     PopoverClose,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { useUI } from "@/providers/UIProvider";
-import { useFolderOp } from "@/providers/FolderOpProvider";
-import { useCallback } from "react";
-import { useApolloClient } from "@apollo/client/react";
-import { FolderOrFileFieldsFragmentDoc } from "@/graphql/__generated__/graphql";
 import _ from "lodash";
+import { Button } from "@/components/ui/button";
+import Icon from "@/components/Icon";
+import useFolderContentsSelectionMenu from "@/hooks/useFolderContentsSelectionMenu";
 
 function FolderListToolbar() {
     const hasSelection = store.ui.selectionCount > 0;
-    const { openDialog } = useUI();
-    const folderOp = useFolderOp();
-    const client = useApolloClient();
+    const { onActionHandler } = useFolderContentsSelectionMenu();
 
-    const deleteHandler = useCallback(() => {
-        const data = client.cache.readFragment({
-            fragment: FolderOrFileFieldsFragmentDoc,
-            fragmentName: "FolderOrFileFields",
-            id: [...store.ui.selectedItems][0],
-        });
-        openDialog({
-            title:
-                store.ui.selectionCount === 1 ?
-                    `Delete ${data?.name}`
-                :   `Delete ${store.ui.selectionCount} items`,
-            message: (
-                <>
-                    Are you sure you want to delete
-                    <Text>
-                        {" "}
-                        {store.ui.selectionCount === 1 ?
-                            data?.name
-                        :   `${store.ui.selectionCount} items`}
-                    </Text>
-                    ? This action cannot be undone.
-                </>
-            ),
-            cancelText: "Cancel",
-            confirmText: "Delete",
-            onConfirm: () => {
-                folderOp.delete?.([...store.ui.selectedItems]);
-            },
-        });
-    }, [client.cache, folderOp, openDialog]);
+    const deletePressHandler = () => {
+        onActionHandler("delete", [...store.ui.selectedItems]);
+    };
 
     return (
         <View className="flex-row items-center justify-between px-3 pb-2">
@@ -64,11 +33,14 @@ function FolderListToolbar() {
             <View className="flex-row items-center gap-x-2">
                 {hasSelection ?
                     <>
-                        <Text variant="large" className="mr-2.5">
-                            {store.ui.selectionCount} selected
-                        </Text>
+                        <Button variant="outline" className="rounded-full">
+                            <Icon name="close_line" size={20} />
+                            <Text>
+                                {store.ui.selectionCount} selected
+                            </Text>
+                        </Button>
                         <IconButton
-                            onPress={deleteHandler}
+                            onPress={deletePressHandler}
                             name="delete_2_line"
                             size={22}
                         />

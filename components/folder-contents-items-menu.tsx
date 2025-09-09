@@ -2,7 +2,12 @@ import { useTheme } from "@react-navigation/native";
 import { Text } from "./ui/text";
 import { IconButton } from "./Button";
 import Icon from "./Icon";
-import { ScrollView, View, ActivityIndicator } from "react-native";
+import {
+    ScrollView,
+    View,
+    ActivityIndicator,
+    Pressable,
+} from "react-native";
 import {
     memo,
     Suspense,
@@ -34,19 +39,18 @@ import {
 } from "./ui/dropdown-menu";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import _ from "lodash";
+import useFolderContentsSelectionMenu, {
+    menuConfig,
+    MenuItemConfig,
+} from "@/hooks/useFolderContentsSelectionMenu";
 
 interface ItemsMenuProps {
-    refs: `${NonNullable<(Folder | File)["__typename"]>}:${string}`[];
-    onAction?: (action: string, refs: ItemsMenuProps["refs"]) => void;
+    refs: __ref[];
+    onAction?: (
+        action: MenuItemConfig["action"],
+        refs: ItemsMenuProps["refs"],
+    ) => void;
 }
-
-type MenuItemConfig = {
-    id: string;
-    label: string;
-    icon: ComponentProps<typeof Icon>["name"];
-    action: string;
-    display: "always" | "single";
-};
 
 // --- Reusable MenuItem Component ---
 const MenuItem = memo(function MenuItem({
@@ -61,116 +65,13 @@ const MenuItem = memo(function MenuItem({
     const { colors } = useTheme();
     return (
         <DropdownMenuItem asChild>
-            <View>
+            <Pressable onPress={onPress}>
                 <Icon name={icon} size={20} color={colors.text} />
                 <Text>{label}</Text>
-            </View>
+            </Pressable>
         </DropdownMenuItem>
     );
 });
-
-// --- Menu Configuration Array ---
-const menuConfig: MenuItemConfig[][] = [
-    [
-        {
-            id: "share",
-            label: "Share",
-            icon: "user_add_2_line",
-            action: "share",
-            display: "always",
-        },
-        {
-            id: "manage-access",
-            label: "Manage access",
-            icon: "group_2_line",
-            action: "manageAccess",
-            display: "single",
-        },
-        {
-            id: "star",
-            label: "Add to starred",
-            icon: "star_line",
-            action: "star",
-            display: "always",
-        },
-        {
-            id: "offline",
-            label: "Make available offline",
-            icon: "wifi_off_line",
-            action: "offline",
-            display: "always",
-        },
-    ],
-    [
-        {
-            id: "copy-link",
-            label: "Copy link",
-            icon: "link_2_line",
-            action: "copyLink",
-            display: "single",
-        },
-        {
-            id: "make-copy",
-            label: "Make a copy",
-            icon: "copy_2_line",
-            action: "makeCopy",
-            display: "always",
-        },
-        {
-            id: "send-copy",
-            label: "Send a copy",
-            icon: "forward_2_line",
-            action: "sendCopy",
-            display: "always",
-        },
-    ],
-    [
-        {
-            id: "download",
-            label: "Download",
-            icon: "download_2_line",
-            action: "download",
-            display: "always",
-        },
-        {
-            id: "rename",
-            label: "Rename",
-            icon: "edit_2_line",
-            action: "rename",
-            display: "single",
-        },
-        {
-            id: "move",
-            label: "Move",
-            icon: "file_export_line",
-            action: "move",
-            display: "always",
-        },
-        {
-            id: "delete",
-            label: "Delete",
-            icon: "delete_3_line",
-            action: "delete",
-            display: "always",
-        },
-    ],
-    [
-        {
-            id: "report",
-            label: "Report",
-            icon: "flag_1_line",
-            action: "report",
-            display: "always",
-        },
-        {
-            id: "info",
-            label: "Info and activities",
-            icon: "information_line",
-            action: "info",
-            display: "single",
-        },
-    ],
-];
 
 // --- Improved Options Component ---
 const Options = memo(function Options({
@@ -250,8 +151,11 @@ const LoadingState = () => (
     </View>
 );
 
-export function ItemsMenu(props: ItemsMenuProps) {
+export const ItemsMenu = memo(function ItemsMenu(
+    props: Omit<ItemsMenuProps, "onAction">,
+) {
     const [shown, setShown] = useState(false);
+    const { onActionHandler } = useFolderContentsSelectionMenu();
     const insets = useSafeAreaInsets();
     const contentInsets = {
         top: insets.top,
@@ -259,7 +163,6 @@ export function ItemsMenu(props: ItemsMenuProps) {
         left: 4,
         right: 4,
     };
-    // Avoid rendering the popover content unless it's needed.
     const shouldRenderContent = props.refs.length > 0 && shown;
 
     return (
@@ -277,11 +180,11 @@ export function ItemsMenu(props: ItemsMenuProps) {
                     {shouldRenderContent && (
                         <Options
                             refs={props.refs}
-                            onAction={props.onAction}
+                            onAction={onActionHandler}
                         />
                     )}
                 </Suspense>
             </DropdownMenuContent>
         </DropdownMenu>
     );
-}
+});

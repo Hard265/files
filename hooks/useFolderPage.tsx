@@ -11,6 +11,7 @@ import store from "@/stores";
 import useBackHandler from "./useBackHandler";
 import { UserMenu } from "@/components/user-menu";
 import FolderHeaderRight from "@/components/folder-header-right";
+import { FolderTitle } from "@/components/folder-title";
 
 export default function useFolderPage(id: string | null = null) {
     const navigation =
@@ -61,6 +62,7 @@ export default function useFolderPage(id: string | null = null) {
         useCallback(() => {
             navigation.setOptions({
                 title,
+                headerTitle: (props) => <FolderTitle {...props} />,
                 headerLeft:
                     id !== null ? undefined : () => <UserMenu />,
                 headerRight: ({ tintColor }) => (

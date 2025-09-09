@@ -4,9 +4,9 @@ import { observer } from "mobx-react-lite";
 import FolderContents from "@/components/folder-contents";
 import { Suspense, useMemo } from "react";
 import { Text } from "@/components/ui/text";
-import FolderListHeader from "@/partials/FolderListHeader";
 import { FolderContentsSkeleton } from "@/components/folder-contents-skeleton";
 import { FolderOpProvider } from "@/providers/FolderOpProvider";
+import { FolderContentsHeader } from "@/components/folder-contents-header";
 
 function HomePage() {
     const { ops } = useFolderPage(null);
@@ -20,7 +20,7 @@ function HomePage() {
                         </View>
                     }
                 >
-                    <FolderListHeader />
+                    <FolderContentsHeader />
                 </Suspense>
                 <Suspense fallback={<FolderContentsSkeleton />}>
                     <FolderContents />

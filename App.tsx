@@ -14,6 +14,9 @@ import LoadingPage from "./components/LoadingPage";
 import { NAV_THEME } from "./lib/theme";
 import client from "./services/client";
 import { UIProvider } from "./providers/UIProvider";
+import * as SplashScreen from "expo-splash-screen";
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
     const colorSchemeName = useColorScheme();
@@ -55,7 +58,7 @@ export default function App() {
 
     if (fontsErr) return <FatalError />;
 
-    if (!fontsLoaded) return <LoadingPage theme={theme} />;
+    if (fontsLoaded) SplashScreen.hideAsync();
 
     return (
         <ThemeProvider value={theme}>
@@ -68,6 +71,7 @@ export default function App() {
                 </GestureHandlerRootView>
             </ApolloProvider>
             <StatusBar
+                animated
                 style={colorSchemeName === "dark" ? "light" : "dark"}
             />
         </ThemeProvider>

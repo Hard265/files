@@ -16,7 +16,7 @@ import { formatBytesIEC } from "@/utils";
 
 type ItemUnion = FolderFieldsFragment | FileFieldsFragment;
 
-function FolderListItem({
+function FolderContentsItem({
     id,
     type,
     onOpen,
@@ -85,4 +85,4 @@ function FolderListItem({
     );
 }
 
-export default observer(FolderListItem);
+export default observer(FolderContentsItem);

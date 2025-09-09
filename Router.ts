@@ -10,6 +10,7 @@ import FolderPage from "./pages/Folder";
 import SignUpPage from "./pages/SignUp";
 import VerifyEmailPage from "./pages/VerifyEmail";
 import ForgotPasswordPage from "./pages/ForgotPassword";
+import ManageAccessPage from "./pages/ManageAccess";
 
 export type RootStackParamsList = {
     SignIn: undefined;
@@ -21,6 +22,9 @@ export type RootStackParamsList = {
     Home: undefined;
     Folder: {
         id: string;
+    };
+    ManageAccess: {
+        ref: __ref;
     };
 };
 
@@ -65,6 +69,12 @@ const RootStack = createNativeStackNavigator({
                     screen: FolderPage,
                     options: {
                         animation: "slide_from_right",
+                    },
+                },
+                ManageAccess: {
+                    screen: ManageAccessPage,
+                    options: {
+                        title: "Manage access",
                     },
                 },
             },

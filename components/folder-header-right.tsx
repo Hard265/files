@@ -10,7 +10,7 @@ import _ from "lodash";
 import { observer } from "mobx-react-lite";
 import React, { ComponentProps } from "react";
 import { View } from "react-native";
-import { ItemsMenu } from "@/components/items-menu";
+import { ItemsMenu } from "@/components/folder-contents-items-menu";
 import { PlusMenu } from "@/components/plus-menu";
 
 function FolderHeaderRight({ tintColor }: { tintColor?: string }) {

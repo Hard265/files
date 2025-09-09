@@ -3,7 +3,7 @@ import {
     Folder,
     GetFolderContentsDocument,
 } from "@/graphql/__generated__/graphql";
-import FolderListItem from "@/partials/FolderListItem";
+import FolderContentsItem from "@/components/folder-contents-item";
 import { useSuspenseQuery } from "@apollo/client/react";
 import { AnimatedFlashList as FlashList } from "@shopify/flash-list";
 import { Suspense, useCallback, startTransition } from "react";
@@ -18,6 +18,8 @@ import { RootStackParamsList } from "@/Router";
 import { Text } from "./ui/text";
 import useHeaderScroll from "@/hooks/useHeaderScroll";
 import { RefreshControl, View } from "react-native";
+import { FolderContentsItemSkeleton } from "./folder-contents-item-skeleton";
+import FolderContentsEmpty from "./folder-contents-empty";
 
 function FolderContents() {
     const route =
@@ -52,8 +54,8 @@ function FolderContents() {
     const render = ({ item }: { item: (typeof items)[number] }) => {
         return (
             <ErrorBoundary fallback={<Text>error</Text>}>
-                <Suspense fallback={<Text>Loading...</Text>}>
-                    <FolderListItem
+                <Suspense fallback={<FolderContentsItemSkeleton />}>
+                    <FolderContentsItem
                         id={item.id}
                         type={item.__typename}
                         onOpen={() => onOpenHandler(item.id)}
@@ -84,6 +86,7 @@ function FolderContents() {
                 renderItem={render}
                 refreshControl={renderRefreshControl()}
                 keyExtractor={(item) => item.id}
+                ListEmptyComponent={<FolderContentsEmpty />}
             />
         </View>
     );
