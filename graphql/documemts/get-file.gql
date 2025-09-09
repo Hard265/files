@@ -1,0 +1,5 @@
+query GetFile($id: UUID!) {
+    file(id: $id) {
+        ... FileFields
+    }
+}
