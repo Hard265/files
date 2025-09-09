@@ -1,3 +1,7 @@
+directive @defer(if: Boolean, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+directive @stream(if: Boolean, label: String, initialCount: Int = 0) on FIELD
+
 enum ContentType {
   FILE
   FOLDER
@@ -141,8 +145,10 @@ type Query {
   links(pagination: PaginationInput = null, sort: [SortInput!] = null): [Link!]!
   filePermission(id: UUID!): FilePermission
   filePermissions(pagination: PaginationInput = null, sort: [SortInput!] = null): [FilePermission!]!
+  filePermissionsByFileId(fileId: UUID!): [FilePermission!]!
   folderPermission(id: UUID!): FolderPermission
   folderPermissions(pagination: PaginationInput = null, sort: [SortInput!] = null): [FolderPermission!]!
+  folderPermissionsByFolderId(folderId: UUID!): [FolderPermission!]!
   search(query: String!, folderId: UUID = null, filter: FilterInput = null): SearchResult!
   hello: String!
 }

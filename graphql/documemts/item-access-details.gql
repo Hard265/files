@@ -1,0 +1,14 @@
+query ItemAccessDetails($id: UUID!, $isFolder: Boolean = false, $isFile: Boolean = false) {
+    file(id: $id) @include(if: $isFile) {
+        ...FileFields
+    }
+    folder(id: $id) @include(if: $isFolder) {
+        ...FolderFields
+    }
+    filePermissionsByFileId(fileId: $id) @include (if: $isFile) {
+        ...FilePermissionFields
+    }
+    folderPermissionsByFolderId(folderId: $id) @include (if: $isFolder) {
+        ...FolderPermissionFields
+    }
+}

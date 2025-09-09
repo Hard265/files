@@ -17,9 +17,12 @@ type Documents = {
     "query GetFile($id: UUID!) {\n  file(id: $id) {\n    ...FileFields\n  }\n}": typeof types.GetFileDocument,
     "query GetFolderContents($folderId: UUID = null) {\n  folders(folderId: $folderId) {\n    ...FolderFields @defer\n  }\n  files(folderId: $folderId) {\n    ...FileFields @defer\n  }\n}": typeof types.GetFolderContentsDocument,
     "query GetFolder($id: UUID!) {\n  folder(id: $id) {\n    ...FolderFields\n  }\n}": typeof types.GetFolderDocument,
+    "query ItemAccessDetails($id: UUID!, $isFolder: Boolean = false, $isFile: Boolean = false) {\n  file(id: $id) @include(if: $isFile) {\n    ...FileFields\n  }\n  folder(id: $id) @include(if: $isFolder) {\n    ...FolderFields\n  }\n  filePermissionsByFileId(fileId: $id) @include(if: $isFile) {\n    ...FilePermissionFields\n  }\n  folderPermissionsByFolderId(folderId: $id) @include(if: $isFolder) {\n    ...FolderPermissionFields\n  }\n}": typeof types.ItemAccessDetailsDocument,
     "fragment FileFields on File {\n  id\n  name\n  folderId\n  starred\n  ext\n  size\n  mimeType\n  updatedAt\n  createdAt\n}": typeof types.FileFieldsFragmentDoc,
+    "fragment FilePermissionFields on FilePermission {\n  id\n  userId\n  fileId\n  role\n}": typeof types.FilePermissionFieldsFragmentDoc,
     "fragment FolderFields on Folder {\n  id\n  name\n  parentId\n  starred\n  updatedAt\n  createdAt\n}": typeof types.FolderFieldsFragmentDoc,
     "fragment FolderOrFileFields on FolderOrFile {\n  ...FolderFields @unmask\n  ...FileFields @unmask\n}": typeof types.FolderOrFileFieldsFragmentDoc,
+    "fragment FolderPermissionFields on FolderPermission {\n  id\n  userId\n  folderId\n  role\n}": typeof types.FolderPermissionFieldsFragmentDoc,
     "mutation DeleteFile($id: UUID!) {\n  deleteFile(id: $id)\n}": typeof types.DeleteFileDocument,
     "mutation DeleteFolder($id: UUID!) {\n  deleteFolder(id: $id)\n}": typeof types.DeleteFolderDocument,
 };
@@ -27,9 +30,12 @@ const documents: Documents = {
     "query GetFile($id: UUID!) {\n  file(id: $id) {\n    ...FileFields\n  }\n}": types.GetFileDocument,
     "query GetFolderContents($folderId: UUID = null) {\n  folders(folderId: $folderId) {\n    ...FolderFields @defer\n  }\n  files(folderId: $folderId) {\n    ...FileFields @defer\n  }\n}": types.GetFolderContentsDocument,
     "query GetFolder($id: UUID!) {\n  folder(id: $id) {\n    ...FolderFields\n  }\n}": types.GetFolderDocument,
+    "query ItemAccessDetails($id: UUID!, $isFolder: Boolean = false, $isFile: Boolean = false) {\n  file(id: $id) @include(if: $isFile) {\n    ...FileFields\n  }\n  folder(id: $id) @include(if: $isFolder) {\n    ...FolderFields\n  }\n  filePermissionsByFileId(fileId: $id) @include(if: $isFile) {\n    ...FilePermissionFields\n  }\n  folderPermissionsByFolderId(folderId: $id) @include(if: $isFolder) {\n    ...FolderPermissionFields\n  }\n}": types.ItemAccessDetailsDocument,
     "fragment FileFields on File {\n  id\n  name\n  folderId\n  starred\n  ext\n  size\n  mimeType\n  updatedAt\n  createdAt\n}": types.FileFieldsFragmentDoc,
+    "fragment FilePermissionFields on FilePermission {\n  id\n  userId\n  fileId\n  role\n}": types.FilePermissionFieldsFragmentDoc,
     "fragment FolderFields on Folder {\n  id\n  name\n  parentId\n  starred\n  updatedAt\n  createdAt\n}": types.FolderFieldsFragmentDoc,
     "fragment FolderOrFileFields on FolderOrFile {\n  ...FolderFields @unmask\n  ...FileFields @unmask\n}": types.FolderOrFileFieldsFragmentDoc,
+    "fragment FolderPermissionFields on FolderPermission {\n  id\n  userId\n  folderId\n  role\n}": types.FolderPermissionFieldsFragmentDoc,
     "mutation DeleteFile($id: UUID!) {\n  deleteFile(id: $id)\n}": types.DeleteFileDocument,
     "mutation DeleteFolder($id: UUID!) {\n  deleteFolder(id: $id)\n}": types.DeleteFolderDocument,
 };
@@ -63,7 +69,15 @@ export function graphql(source: "query GetFolder($id: UUID!) {\n  folder(id: $id
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "query ItemAccessDetails($id: UUID!, $isFolder: Boolean = false, $isFile: Boolean = false) {\n  file(id: $id) @include(if: $isFile) {\n    ...FileFields\n  }\n  folder(id: $id) @include(if: $isFolder) {\n    ...FolderFields\n  }\n  filePermissionsByFileId(fileId: $id) @include(if: $isFile) {\n    ...FilePermissionFields\n  }\n  folderPermissionsByFolderId(folderId: $id) @include(if: $isFolder) {\n    ...FolderPermissionFields\n  }\n}"): (typeof documents)["query ItemAccessDetails($id: UUID!, $isFolder: Boolean = false, $isFile: Boolean = false) {\n  file(id: $id) @include(if: $isFile) {\n    ...FileFields\n  }\n  folder(id: $id) @include(if: $isFolder) {\n    ...FolderFields\n  }\n  filePermissionsByFileId(fileId: $id) @include(if: $isFile) {\n    ...FilePermissionFields\n  }\n  folderPermissionsByFolderId(folderId: $id) @include(if: $isFolder) {\n    ...FolderPermissionFields\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "fragment FileFields on File {\n  id\n  name\n  folderId\n  starred\n  ext\n  size\n  mimeType\n  updatedAt\n  createdAt\n}"): (typeof documents)["fragment FileFields on File {\n  id\n  name\n  folderId\n  starred\n  ext\n  size\n  mimeType\n  updatedAt\n  createdAt\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "fragment FilePermissionFields on FilePermission {\n  id\n  userId\n  fileId\n  role\n}"): (typeof documents)["fragment FilePermissionFields on FilePermission {\n  id\n  userId\n  fileId\n  role\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -72,6 +86,10 @@ export function graphql(source: "fragment FolderFields on Folder {\n  id\n  name
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "fragment FolderOrFileFields on FolderOrFile {\n  ...FolderFields @unmask\n  ...FileFields @unmask\n}"): (typeof documents)["fragment FolderOrFileFields on FolderOrFile {\n  ...FolderFields @unmask\n  ...FileFields @unmask\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "fragment FolderPermissionFields on FolderPermission {\n  id\n  userId\n  folderId\n  role\n}"): (typeof documents)["fragment FolderPermissionFields on FolderPermission {\n  id\n  userId\n  folderId\n  role\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

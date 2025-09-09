@@ -1,0 +1,6 @@
+fragment FilePermissionFields on FilePermission {
+    id
+    userId
+    fileId
+    role
+}

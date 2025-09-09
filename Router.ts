@@ -25,6 +25,7 @@ export type RootStackParamsList = {
     };
     ManageAccess: {
         ref: __ref;
+        tab?: "people" | "links";
     };
 };
 
@@ -75,6 +76,9 @@ const RootStack = createNativeStackNavigator({
                     screen: ManageAccessPage,
                     options: {
                         title: "Manage access",
+                    },
+                    initialParams: {
+                        tab: "people",
                     },
                 },
             },

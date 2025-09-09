@@ -1,0 +1,6 @@
+fragment FolderPermissionFields on FolderPermission {
+    id
+    userId
+    folderId
+    role
+}
