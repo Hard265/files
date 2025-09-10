@@ -79,7 +79,7 @@ export function UIProvider({ children }: PropsWithChildren) {
                             {dialogOptions?.message}
                         </DialogDescription>
                     </DialogHeader>
-                    <DialogFooter className="flex-row items-center justify-end gap-x-4">
+                    <DialogFooter>
                         {dialogOptions?.cancelText && (
                             <DialogClose asChild>
                                 <Button

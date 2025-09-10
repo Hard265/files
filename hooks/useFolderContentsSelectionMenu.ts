@@ -1,36 +1,9 @@
 import Icon from "@/components/Icon";
+import { useUI } from "@/providers/UIProvider";
 import { RootStackParamsList } from "@/Router";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ComponentProps } from "react";
-
-export default function useFolderContentsSelectionMenu() {
-    const navigation =
-        useNavigation<
-            NativeStackNavigationProp<RootStackParamsList>
-        >();
-
-    const handler = (
-        action: MenuItemConfig["action"],
-        items: __ref[],
-    ) => {
-        // Handle the action with the selected items
-        switch (action) {
-            case "manageAccess":
-                navigation.navigate("ManageAccess", {
-                    ref: items[0],
-                });
-                break;
-            case "delete":
-                // Delete the selected items
-                break;
-            // Add more cases as needed
-        }
-    };
-    return {
-        onActionHandler: handler,
-    };
-}
+import { ComponentProps, useCallback, useMemo } from "react";
 
 export type MenuItemConfig = {
     id: string;
@@ -53,6 +26,107 @@ export type MenuItemConfig = {
     display: "always" | "single";
 };
 
+type ActionHandlerMap = Record<
+    MenuItemConfig["action"],
+    (items: __ref[]) => void
+>;
+
+export default function useFolderContentsSelectionMenu() {
+    const navigation =
+        useNavigation<
+            NativeStackNavigationProp<RootStackParamsList>
+        >();
+    const { openDialog } = useUI();
+
+    /**
+     * Maps each action to a specific handler function.
+     */
+    const actionHandlers: ActionHandlerMap = useMemo(
+        () => ({
+            manageAccess: (items) => {
+                if (items.length > 0) {
+                    navigation.navigate("ManageAccess", {
+                        ref: items[0],
+                    });
+                }
+            },
+            delete: (items) => {
+                openDialog({
+                    title: "Confirm Deletion",
+                    message: `Are you sure you want to delete ${items.length} item(s)?. This action cannot be undone.`,
+                    cancelText: "Cancel",
+                    confirmText: "Delete",
+                    onConfirm: () => {
+                        console.log(
+                            "Confirmed deletion of items:",
+                            items,
+                        );
+                    },
+                });
+            },
+            share: (items) => {
+                console.log("Sharing items:", items);
+            },
+            star: (items) => {
+                console.log("Starring items:", items);
+            },
+            offline: (items) => {
+                console.log("Making items available offline:", items);
+            },
+            copyLink: (items) => {
+                console.log("Copying link for items:", items);
+            },
+            makeCopy: (items) => {
+                console.log("Making a copy of items:", items);
+            },
+            sendCopy: (items) => {
+                console.log("Sending a copy of items:", items);
+            },
+            download: (items) => {
+                console.log("Downloading items:", items);
+            },
+            rename: (items) => {
+                console.log("Renaming items:", items);
+            },
+            move: (items) => {
+                console.log("Moving items:", items);
+            },
+            report: (items) => {
+                console.log("Reporting items:", items);
+            },
+            info: (items) => {
+                console.log("Showing info for items:", items);
+            },
+        }),
+        [navigation, openDialog],
+    );
+
+    /**
+     * The main handler function that dispatches the action.
+     * It looks up the correct handler from the action map and executes it.
+     */
+    const handler = useCallback(
+        (action: MenuItemConfig["action"], items: __ref[]) => {
+            const handleAction = actionHandlers[action];
+            if (handleAction) {
+                handleAction(items);
+            } else {
+                console.warn(
+                    `No handler found for action: ${action}`,
+                );
+            }
+        },
+        [actionHandlers],
+    );
+
+    return {
+        onActionHandler: handler,
+    };
+}
+
+/**
+ * Defines the complete menu configuration.
+ */
 export const menuConfig: MenuItemConfig[][] = [
     [
         {
