@@ -1,0 +1,4 @@
+fragment FolderOrFileFields on FolderOrFile {
+    ...FolderFields @unmasked
+    ...FileFields @unmask
+}

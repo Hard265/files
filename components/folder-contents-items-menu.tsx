@@ -2,12 +2,7 @@ import { useTheme } from "@react-navigation/native";
 import { Text } from "./ui/text";
 import { IconButton } from "./Button";
 import Icon from "./Icon";
-import {
-    ScrollView,
-    View,
-    ActivityIndicator,
-    Pressable,
-} from "react-native";
+import { View, ActivityIndicator, Pressable } from "react-native";
 import {
     memo,
     Suspense,
@@ -15,12 +10,6 @@ import {
     ComponentProps,
     useMemo,
 } from "react";
-import { Separator } from "./ui/separator";
-import {
-    File,
-    Folder,
-    FolderOrFileFieldsFragmentDoc,
-} from "@/graphql/__generated__/graphql";
 import { useSuspenseFragment } from "@apollo/client/react";
 import { formatBytesIEC } from "@/utils";
 import dayjs from "dayjs";
@@ -31,10 +20,6 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -43,6 +28,7 @@ import useFolderContentsSelectionMenu, {
     menuConfig,
     MenuItemConfig,
 } from "@/hooks/useFolderContentsSelectionMenu";
+import {FolderOrFileFieldsFragmentDoc} from "@/graphql/__generated__/graphql";
 
 interface ItemsMenuProps {
     refs: __ref[];

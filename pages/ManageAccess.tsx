@@ -1,5 +1,15 @@
 import Icon from "@/components/Icon";
+import { TriggerRef } from "@/components/primitives/select";
 import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectGroup,
+    SelectLabel,
+    SelectItem,
+} from "@/components/ui/select";
 import {
     Tabs,
     TabsList,
@@ -7,24 +17,35 @@ import {
     TabsContent,
 } from "@/components/ui/tabs";
 import { Text } from "@/components/ui/text";
+import { UserAvatar } from "@/components/user-avatar";
 import {
+    ChangeFilePermissionRoleDocument,
+    ChangeFolderPermissionRoleDocument,
     FileFieldsFragment,
     FilePermissionFieldsFragment,
     FilePermissionFieldsFragmentDoc,
     FolderFieldsFragment,
-    FolderOrFileFieldsFragmentDoc,
     FolderPermissionFieldsFragment,
     FolderPermissionFieldsFragmentDoc,
+    FolderOrFileFieldsFragmentDoc,
     ItemAccessDetailsDocument,
+    RoleEnum,
+    GetUserDocument,
 } from "@/graphql/__generated__/graphql";
 import { RootStackParamsList } from "@/Router";
 import {
+    useMutation,
     useSuspenseFragment,
     useSuspenseQuery,
 } from "@apollo/client/react";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useCallback, useMemo } from "react";
+import { useNavigation } from "@react-navigation/native";
+import {
+    NativeStackNavigationProp,
+    NativeStackScreenProps,
+} from "@react-navigation/native-stack";
+import { useCallback, useMemo, useRef } from "react";
 import { ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Type definitions
 type ItemType = "File" | "Folder";
@@ -39,6 +60,7 @@ interface HeaderProps {
 
 interface PermissionProps {
     ref: PermissionRef;
+    onChange: (role: RoleEnum) => void;
 }
 
 // Utility functions
@@ -75,20 +97,22 @@ function Header({ ref }: HeaderProps) {
 
     if (!data?.name) {
         return (
-            <View className="p-4 items-start gap-y-2">
+            <View className="items-start p-4 gap-y-2">
                 <Text className="text-gray-500">Unknown item</Text>
             </View>
         );
     }
 
     return (
-        <View className="p-4 items-start gap-y-2">
+        <View className="items-start p-4 gap-y-2">
             <Text className="text-lg font-semibold">{data.name}</Text>
         </View>
     );
 }
 
 function Permission({ ref }: PermissionProps) {
+    const contentInsets = useSafeAreaInsets();
+    const triggerRef = useRef<TriggerRef>(null);
     const isFolderPermission = useMemo(
         () => ref.startsWith("FolderPermission:"),
         [ref],
@@ -110,17 +134,141 @@ function Permission({ ref }: PermissionProps) {
         },
     });
 
+    const { data: user } = useSuspenseQuery(GetUserDocument, {
+        variables: {
+            id: data.userId,
+        },
+    });
+
+    const [updateFilePermission] = useMutation(
+        ChangeFilePermissionRoleDocument,
+        {
+            optimisticResponse(vars) {
+                return {
+                    __typename: "Mutation",
+                    updateFilePermission: {
+                        __typename: "FilePermission",
+                        fileId: data.fileId,
+                        userId: data.userId,
+                        role: vars.role,
+                    },
+                };
+            },
+            update(cache, { data }) {
+                if (!data?.updateFilePermission) return;
+                cache.modify({
+                    id: ref,
+                    fields: {
+                        role() {
+                            return data.updateFilePermission.role;
+                        },
+                    },
+                });
+            },
+        },
+    );
+    const [updateFolderPermission] = useMutation(
+        ChangeFolderPermissionRoleDocument,
+        {
+            optimisticResponse(vars, { IGNORE }) {
+                return {
+                    __typename: "Mutation",
+                    updateFolderPermission: {
+                        __typename: "FolderPermission",
+                        folderId: data.folderId,
+                        userId: data.userId,
+                        role: vars.role,
+                    },
+                };
+            },
+            update(cache, { data }) {
+                if (!data?.updateFolderPermission) return;
+                cache.modify({
+                    id: ref,
+                    fields: {
+                        role() {
+                            return data.updateFolderPermission.role;
+                        },
+                    },
+                });
+            },
+        },
+    );
+
+    const onTriggerTouchStart = useCallback(() => {
+        triggerRef.current?.open();
+    }, [triggerRef]);
+
+    const onRoleChange = useCallback(
+        (role: RoleEnum) => {
+            if (role === data.role) return;
+            else if (data.__typename === "FolderPermission") {
+                updateFolderPermission({
+                    variables: {
+                        id: data.folderId,
+                        role,
+                    },
+                });
+            } else if (data.__typename === "FilePermission") {
+                updateFilePermission({
+                    variables: {
+                        id: data.fileId,
+                        role,
+                    },
+                });
+            }
+        },
+        [data, updateFolderPermission, updateFilePermission],
+    );
+
+    const roles = [RoleEnum.Owner, RoleEnum.Editor, RoleEnum.Viewer];
+
     return (
-        <View className="flex-row justify-between items-center p-3 bg-gray-50 rounded-lg">
+        <View className="flex-row items-center gap-x-2">
+            <UserAvatar email={user?.user.email} />
             <View className="flex-1">
-                <Text className="font-medium">{data.userId}</Text>
-                <Text className="text-sm text-gray-600 capitalize">
-                    {data.role}
+                <Text className="font-medium">
+                    {user?.user.email}
                 </Text>
             </View>
-            <Button variant="ghost" size="sm">
-                <Icon name="more_horiz" size={20} />
-            </Button>
+            <Select
+                defaultValue={{
+                    label: data.role,
+                    value: data.role,
+                }}
+                onValueChange={(option) =>
+                    onRoleChange(
+                        (option?.value as RoleEnum) || data.role,
+                    )
+                }
+                disabled={data.role === RoleEnum.Owner}
+            >
+                <SelectTrigger
+                    disabled={data.role === RoleEnum.Owner}
+                    className="min-w-[120px]"
+                    ref={triggerRef}
+                    onTouchStart={onTriggerTouchStart}
+                >
+                    <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent
+                    insets={contentInsets}
+                    className="w-auto"
+                >
+                    <SelectGroup>
+                        <SelectLabel>Change role</SelectLabel>
+                        {roles.map((role) => (
+                            <SelectItem
+                                key={role}
+                                label={role}
+                                value={role}
+                            >
+                                {role}
+                            </SelectItem>
+                        ))}
+                    </SelectGroup>
+                </SelectContent>
+            </Select>
         </View>
     );
 }
@@ -132,12 +280,16 @@ function EmptyState({
 }) {
     return (
         <View className="items-center py-8 gap-y-4">
-            <Icon name="group" size={48} className="text-gray-300" />
+            <Icon
+                name="group_3_line"
+                size={48}
+                className="text-gray-300"
+            />
             <View className="items-center gap-y-2">
                 <Text className="text-lg font-medium text-gray-900">
                     No one has access yet
                 </Text>
-                <Text className="text-gray-600 text-center">
+                <Text className="text-center text-gray-600">
                     Share this item to collaborate with others
                 </Text>
             </View>
@@ -159,33 +311,30 @@ function PeopleTab({
     )[];
     onStartSharing: () => void;
 }) {
+    const changeRoleHandler = useCallback(
+        (ref: PermissionRef, role: RoleEnum) => {},
+        [],
+    );
+
     if (permissions.length === 0) {
         return <EmptyState onStartSharing={onStartSharing} />;
     }
 
     return (
         <View className="gap-y-3">
-            <View className="flex-row justify-between items-center">
-                <Text className="text-lg font-semibold">
-                    People ({permissions.length})
-                </Text>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onPress={onStartSharing}
-                >
-                    <Icon name="add" size={16} />
-                    <Text className="ml-1">Add</Text>
-                </Button>
-            </View>
-            {permissions.map((permission) => (
-                <Permission
-                    key={permission.id}
-                    ref={
-                        `${permission.__typename}:${permission.id}` as PermissionRef
-                    }
-                />
-            ))}
+            {permissions.map((permission) => {
+                const ref =
+                    `${permission.__typename}:${permission.id}` as PermissionRef;
+                return (
+                    <Permission
+                        key={permission.id}
+                        ref={ref}
+                        onChange={(role) =>
+                            changeRoleHandler(ref, role)
+                        }
+                    />
+                );
+            })}
         </View>
     );
 }
@@ -193,17 +342,21 @@ function PeopleTab({
 function LinksTab() {
     return (
         <View className="items-center py-8 gap-y-4">
-            <Icon name="link" size={48} className="text-gray-300" />
+            <Icon
+                name="link_line"
+                size={48}
+                className="text-gray-300"
+            />
             <View className="items-center gap-y-2">
                 <Text className="text-lg font-medium text-gray-900">
                     No shared links
                 </Text>
-                <Text className="text-gray-600 text-center">
+                <Text className="text-center text-gray-600">
                     Create shareable links for easy access
                 </Text>
             </View>
             <Button variant="outline">
-                <Icon name="add" size={20} />
+                <Icon name="add_circle_line" size={20} />
                 <Text className="ml-2">Create link</Text>
             </Button>
         </View>
@@ -212,21 +365,13 @@ function LinksTab() {
 
 export default function ManageAccessPage({
     route,
-    navigation,
 }: NativeStackScreenProps<RootStackParamsList, "ManageAccess">) {
+    const navigation =
+        useNavigation<
+            NativeStackNavigationProp<RootStackParamsList>
+        >();
     const [type, id] = parseItemRef(route.params.ref);
     const tab = (route.params.tab ?? "people") as TabType;
-
-    // Validate params
-    if (!type || !id) {
-        return (
-            <View className="flex-1 justify-center items-center p-4">
-                <Text className="text-red-600">
-                    Invalid item reference
-                </Text>
-            </View>
-        );
-    }
 
     const { data, error } = useSuspenseQuery(
         ItemAccessDetailsDocument,
@@ -240,36 +385,18 @@ export default function ManageAccessPage({
         },
     );
 
-    // Handle query errors
-    if (error && !data) {
-        return (
-            <View className="flex-1 justify-center items-center p-4">
-                <Text className="text-red-600">
-                    Failed to load access details
-                </Text>
-                <Button
-                    variant="outline"
-                    onPress={() => navigation.goBack()}
-                    className="mt-4"
-                >
-                    <Text>Go back</Text>
-                </Button>
-            </View>
-        );
-    }
-
     const permissions = useMemo(
         () =>
             [
-                ...(data.filePermissionsByFileId ?? []),
-                ...(data.folderPermissionsByFolderId ?? []),
+                ...(data?.filePermissionsByFileId ?? []),
+                ...(data?.folderPermissionsByFolderId ?? []),
             ] as (
                 | FolderPermissionFieldsFragment
                 | FilePermissionFieldsFragment
             )[],
         [
-            data.filePermissionsByFileId,
-            data.folderPermissionsByFolderId,
+            data?.filePermissionsByFileId,
+            data?.folderPermissionsByFolderId,
         ],
     );
 
@@ -291,7 +418,7 @@ export default function ManageAccessPage({
     }, []);
 
     return (
-        <ScrollView className="flex-1 bg-white">
+        <ScrollView className="flex-1">
             <Header ref={route.params.ref} />
 
             <View className="p-4">
@@ -300,12 +427,12 @@ export default function ManageAccessPage({
                     onValueChange={onSwitchTab}
                     className="w-full"
                 >
-                    <TabsList className="w-full">
+                    <TabsList className="w-full bg-transparent">
                         <TabsTrigger
                             value="people"
                             className="flex-1"
                         >
-                            <Text>People</Text>
+                            <Text>People ({permissions.length})</Text>
                         </TabsTrigger>
                         <TabsTrigger value="links" className="flex-1">
                             <Text>Links</Text>

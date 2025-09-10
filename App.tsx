@@ -10,11 +10,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FatalError from "./components/FatalError";
-import LoadingPage from "./components/LoadingPage";
 import { NAV_THEME } from "./lib/theme";
 import client from "./services/client";
 import { UIProvider } from "./providers/UIProvider";
 import * as SplashScreen from "expo-splash-screen";
+import { ErrorBoundary } from "react-error-boundary";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -59,21 +59,29 @@ export default function App() {
     if (fontsErr) return <FatalError />;
 
     if (fontsLoaded) SplashScreen.hideAsync();
+    if (!fontsLoaded) return null;
 
     return (
-        <ThemeProvider value={theme}>
-            <ApolloProvider client={client}>
-                <GestureHandlerRootView style={{ flex: 1 }}>
-                    <UIProvider>
-                        <Navigation theme={theme} />
-                        <PortalHost />
-                    </UIProvider>
-                </GestureHandlerRootView>
-            </ApolloProvider>
-            <StatusBar
-                animated
-                style={colorSchemeName === "dark" ? "light" : "dark"}
-            />
-        </ThemeProvider>
+        <ErrorBoundary fallback={<FatalError />}>
+            <ThemeProvider value={theme}>
+                <ApolloProvider client={client}>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                        <UIProvider>
+                            <Navigation
+                                onStateChange={() => {}}
+                                theme={theme}
+                            />
+                            <PortalHost />
+                        </UIProvider>
+                    </GestureHandlerRootView>
+                </ApolloProvider>
+                <StatusBar
+                    animated
+                    style={
+                        colorSchemeName === "dark" ? "light" : "dark"
+                    }
+                />
+            </ThemeProvider>
+        </ErrorBoundary>
     );
 }

@@ -7,14 +7,12 @@ import {
 import { Text } from "@/components/ui/text";
 import type { TriggerRef } from "@/components/primitives/popover";
 import * as React from "react";
-import { PixelRatio, View } from "react-native";
+import { View } from "react-native";
 import Icon from "./Icon";
-import { Avatar } from "./Avatar";
 import store from "@/stores";
-import _ from "lodash";
-import { getGravatarUrl } from "@/utils";
 import { observer } from "mobx-react-lite";
 import { useTheme } from "@react-navigation/native";
+import { UserAvatar } from "./user-avatar";
 
 export const UserMenu = observer(function UserMenu() {
     const { colors } = useTheme();
@@ -33,7 +31,7 @@ export const UserMenu = observer(function UserMenu() {
                     size="icon"
                     className="rounded-full size-12"
                 >
-                    <UserAvatar />
+                    <UserAvatar email={store.auth.user?.email} />
                 </Button>
             </PopoverTrigger>
             <PopoverContent
@@ -108,24 +106,3 @@ export const UserMenu = observer(function UserMenu() {
         </Popover>
     );
 });
-
-const getUrlMemoized = _.memoize(getGravatarUrl);
-
-function UserAvatar() {
-    const [url, setUrl] = React.useState("");
-
-    const avatarSize = React.useMemo(
-        () => PixelRatio.getPixelSizeForLayoutSize(18),
-        [],
-    );
-    React.useEffect(() => {
-        async function fetchGravatar() {
-            if (!store.auth.user) return;
-            const url = await getUrlMemoized(store.auth.user.email);
-            setUrl(url);
-        }
-        fetchGravatar();
-    }, []);
-
-    return <Avatar source={{ uri: url }} size={avatarSize} />;
-}

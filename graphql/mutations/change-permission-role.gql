@@ -1,0 +1,14 @@
+mutation ChangeFilePermissionRole($id: UUID!, $role: RoleEnum!) {
+    updateFilePermission(id: $id, permissionInput: { role: $role }) {
+        ...FilePermissionFields
+    }
+}
+
+mutation ChangeFolderPermissionRole($id: UUID!, $role: RoleEnum!) {
+    updateFolderPermission(
+        id: $id
+        permissionInput: { role: $role }
+    ) {
+        ...FolderPermissionFields
+    }
+}
