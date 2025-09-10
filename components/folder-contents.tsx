@@ -6,7 +6,7 @@ import {
 import FolderContentsItem from "@/components/folder-contents-item";
 import { useSuspenseQuery } from "@apollo/client/react";
 import { AnimatedFlashList as FlashList } from "@shopify/flash-list";
-import { Suspense, useCallback, startTransition } from "react";
+import { Suspense, useCallback, useTransition } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import {
     RouteProp,
@@ -16,10 +16,10 @@ import {
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamsList } from "@/Router";
 import { Text } from "./ui/text";
-import useHeaderScroll from "@/hooks/useHeaderScroll";
 import { RefreshControl, View } from "react-native";
 import { FolderContentsItemSkeleton } from "./folder-contents-item-skeleton";
 import FolderContentsEmpty from "./folder-contents-empty";
+import _ from "lodash";
 
 function FolderContents() {
     const route =
@@ -28,12 +28,12 @@ function FolderContents() {
         useNavigation<
             NativeStackNavigationProp<RootStackParamsList>
         >();
-    const { headerScrollHandler: onScroll } = useHeaderScroll();
-    const { data, dataState, refetch } = useSuspenseQuery(
+    const [isPending, startTransition] = useTransition();
+    const { data, refetch } = useSuspenseQuery(
         GetFolderContentsDocument,
         {
             variables: {
-                folderId: route.params?.id || null,
+                folderId: _.defaultTo(route.params?.id, null),
             },
         },
     );
@@ -68,7 +68,7 @@ function FolderContents() {
     const renderRefreshControl = useCallback(
         () => (
             <RefreshControl
-                refreshing={dataState === "streaming"}
+                refreshing={isPending}
                 onRefresh={() =>
                     startTransition(() => {
                         refetch();
@@ -76,7 +76,7 @@ function FolderContents() {
                 }
             />
         ),
-        [dataState, refetch],
+        [isPending, refetch],
     );
 
     return (
