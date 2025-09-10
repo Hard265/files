@@ -33,8 +33,12 @@ function FolderListToolbar() {
             <View className="flex-row items-center gap-x-2">
                 {hasSelection ?
                     <>
-                        <Button variant="outline" className="rounded-full">
-                            <Icon name="close_line" size={20} />
+                        <Button
+                            onPress={() => store.ui.clearSelection()}
+                            variant="outline"
+                            className="rounded-full px-3 py-1 gap-x-2"
+                        >
+                            <Icon name="close_line" size={18} />
                             <Text>
                                 {store.ui.selectionCount} selected
                             </Text>
