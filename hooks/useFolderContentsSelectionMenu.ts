@@ -65,7 +65,11 @@ export default function useFolderContentsSelectionMenu() {
                 });
             },
             share: (items) => {
-                console.log("Sharing items:", items);
+                if (items.length > 0) {
+                    navigation.navigate("Share", {
+                        refs: items,
+                    });
+                }
             },
             star: (items) => {
                 console.log("Starring items:", items);
