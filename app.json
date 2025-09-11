@@ -41,6 +41,12 @@
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "65db413d-98cb-4af9-b449-46c1631fe6f3"
+      }
+    },
+    "owner": "hard265"
   }
 }
