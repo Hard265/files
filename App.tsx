@@ -15,11 +15,15 @@ import client from "./services/client";
 import { UIProvider } from "./providers/UIProvider";
 import * as SplashScreen from "expo-splash-screen";
 import { ErrorBoundary } from "react-error-boundary";
+import store from "./stores";
+import { useColorScheme as useNWColorScheme } from "nativewind";
+import { observer } from "mobx-react-lite";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function App() {
+function App() {
     const colorSchemeName = useColorScheme();
+    const { setColorScheme } = useNWColorScheme();
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [fontsErr, setFontsErr] = useState<Error | null>(null);
 
@@ -44,17 +48,13 @@ export default function App() {
         loadFonts();
     }, []);
 
-    const theme = useMemo(
-        () =>
-            NAV_THEME[
-                (colorSchemeName as "light" | "dark") || "light"
-            ],
-        [colorSchemeName],
-    );
+    const theme =
+        NAV_THEME[(store.ui.theme as "light" | "dark") || "light"];
 
     useEffect(() => {
         setBackgroundColorAsync(theme.colors.background);
-    }, [colorSchemeName, theme.colors.background]);
+        setColorScheme(store.ui.theme || colorSchemeName || "system");
+    }, [colorSchemeName, setColorScheme, theme.colors.background]);
 
     if (fontsErr) return <FatalError />;
 
@@ -77,11 +77,11 @@ export default function App() {
                 </ApolloProvider>
                 <StatusBar
                     animated
-                    style={
-                        colorSchemeName === "dark" ? "light" : "dark"
-                    }
+                    style={theme.dark ? "light" : "dark"}
                 />
             </ThemeProvider>
         </ErrorBoundary>
     );
 }
+
+export default observer(App);

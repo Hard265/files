@@ -11,8 +11,8 @@ import SignUpPage from "./pages/SignUp";
 import VerifyEmailPage from "./pages/VerifyEmail";
 import ForgotPasswordPage from "./pages/ForgotPassword";
 import ManageAccessPage from "./pages/ManageAccess";
-import { Share } from "react-native";
 import { SharePage } from "./pages/Share";
+import SettingsPage from "./pages/Settings";
 
 export type RootStackParamsList = {
     SignIn: undefined;
@@ -32,6 +32,7 @@ export type RootStackParamsList = {
     Share: {
         refs: __ref[];
     };
+    Settings: undefined;
 };
 
 const RootStack = createNativeStackNavigator({
@@ -93,6 +94,7 @@ const RootStack = createNativeStackNavigator({
                         title: "Share",
                     },
                 },
+                Settings: SettingsPage,
             },
         },
     },

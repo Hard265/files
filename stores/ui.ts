@@ -1,6 +1,7 @@
 import { File, Folder } from "@/graphql/__generated__/graphql";
 import _ from "lodash";
 import { action, computed, makeObservable, observable } from "mobx";
+import { ColorSchemeName } from "react-native";
 
 export type ListView = "compact" | "comfortable";
 type SelectedItem =
@@ -18,18 +19,21 @@ type sortOption =
     `${(typeof sortFields)[number]}:${(typeof sortOrder)[number]}`;
 
 export class UIStore {
+    theme: ColorSchemeName = null;
     listView: ListView = "compact";
     selectedItems: Set<SelectedItem> = new Set();
     sort: sortOption = "name:asc";
 
     constructor() {
         makeObservable(this, {
+            theme: observable,
             listView: observable,
             selectedItems: observable,
             sort: observable,
             isCompact: computed,
             selectionCount: computed,
             sortField: computed,
+            setTheme: action,
             setListView: action,
             toggleSelectedItem: action,
             clearSelection: action,
@@ -51,6 +55,10 @@ export class UIStore {
             (typeof sortOrder)[number],
         ];
         return { field, order };
+    }
+
+    setTheme(theme: ColorSchemeName) {
+        this.theme = theme;
     }
 
     setListView(listView: ListView) {

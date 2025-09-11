@@ -16,6 +16,7 @@ import { UserAvatar } from "./user-avatar";
 
 export const UserMenu = observer(function UserMenu() {
     const { colors } = useTheme();
+    const navigation = useNavigation<NativeStack>()
     const popoverTriggerRef = React.useRef<TriggerRef>(null);
 
     async function onSignOut() {
@@ -66,7 +67,7 @@ export const UserMenu = observer(function UserMenu() {
                                 size={20}
                                 color={colors.text}
                             />
-                            <Text>Manage Account</Text>
+                            <Text>Settings</Text>
                         </Button>
                         <Button
                             variant="outline"
