@@ -1,0 +1,5 @@
+mutation UpdateFile($id: UUID!, $input: UpdateFileInput!) {
+    updateFile(id: $id, fileInput: $input) {
+        ...FileFields @unmask
+    }
+}

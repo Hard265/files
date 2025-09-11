@@ -28,6 +28,8 @@ type Documents = {
     "mutation ChangeFilePermissionRole($id: UUID!, $role: RoleEnum!) {\n  updateFilePermission(id: $id, permissionInput: {role: $role}) {\n    ...FilePermissionFields\n  }\n}\n\nmutation ChangeFolderPermissionRole($id: UUID!, $role: RoleEnum!) {\n  updateFolderPermission(id: $id, permissionInput: {role: $role}) {\n    ...FolderPermissionFields\n  }\n}": typeof types.ChangeFilePermissionRoleDocument,
     "mutation DeleteFile($id: UUID!) {\n  deleteFile(id: $id)\n}": typeof types.DeleteFileDocument,
     "mutation DeleteFolder($id: UUID!) {\n  deleteFolder(id: $id)\n}": typeof types.DeleteFolderDocument,
+    "mutation UpdateFile($id: UUID!, $input: UpdateFileInput!) {\n  updateFile(id: $id, fileInput: $input) {\n    ...FileFields @unmask\n  }\n}": typeof types.UpdateFileDocument,
+    "mutation UpdateFolder($id: UUID!, $input: UpdateFolderInput!) {\n  updateFolder(id: $id, folderInput: $input) {\n    ...FolderFields\n  }\n}": typeof types.UpdateFolderDocument,
 };
 const documents: Documents = {
     "query GetFile($id: UUID!) {\n  file(id: $id) {\n    ...FileFields\n  }\n}": types.GetFileDocument,
@@ -44,6 +46,8 @@ const documents: Documents = {
     "mutation ChangeFilePermissionRole($id: UUID!, $role: RoleEnum!) {\n  updateFilePermission(id: $id, permissionInput: {role: $role}) {\n    ...FilePermissionFields\n  }\n}\n\nmutation ChangeFolderPermissionRole($id: UUID!, $role: RoleEnum!) {\n  updateFolderPermission(id: $id, permissionInput: {role: $role}) {\n    ...FolderPermissionFields\n  }\n}": types.ChangeFilePermissionRoleDocument,
     "mutation DeleteFile($id: UUID!) {\n  deleteFile(id: $id)\n}": types.DeleteFileDocument,
     "mutation DeleteFolder($id: UUID!) {\n  deleteFolder(id: $id)\n}": types.DeleteFolderDocument,
+    "mutation UpdateFile($id: UUID!, $input: UpdateFileInput!) {\n  updateFile(id: $id, fileInput: $input) {\n    ...FileFields @unmask\n  }\n}": types.UpdateFileDocument,
+    "mutation UpdateFolder($id: UUID!, $input: UpdateFolderInput!) {\n  updateFolder(id: $id, folderInput: $input) {\n    ...FolderFields\n  }\n}": types.UpdateFolderDocument,
 };
 
 /**
@@ -116,6 +120,14 @@ export function graphql(source: "mutation DeleteFile($id: UUID!) {\n  deleteFile
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "mutation DeleteFolder($id: UUID!) {\n  deleteFolder(id: $id)\n}"): (typeof documents)["mutation DeleteFolder($id: UUID!) {\n  deleteFolder(id: $id)\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation UpdateFile($id: UUID!, $input: UpdateFileInput!) {\n  updateFile(id: $id, fileInput: $input) {\n    ...FileFields @unmask\n  }\n}"): (typeof documents)["mutation UpdateFile($id: UUID!, $input: UpdateFileInput!) {\n  updateFile(id: $id, fileInput: $input) {\n    ...FileFields @unmask\n  }\n}"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "mutation UpdateFolder($id: UUID!, $input: UpdateFolderInput!) {\n  updateFolder(id: $id, folderInput: $input) {\n    ...FolderFields\n  }\n}"): (typeof documents)["mutation UpdateFolder($id: UUID!, $input: UpdateFolderInput!) {\n  updateFolder(id: $id, folderInput: $input) {\n    ...FolderFields\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

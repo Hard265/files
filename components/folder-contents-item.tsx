@@ -68,7 +68,7 @@ function FolderContentsItem({
             icon={
                 type === "Folder" ?
                     <Icon
-                        name="folder_3_fill"
+                        name="folder_star_line"
                         size={24}
                         color={"orange"}
                     />

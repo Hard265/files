@@ -1,0 +1,5 @@
+mutation UpdateFolder($id: UUID!, $input: UpdateFolderInput!) {
+    updateFolder(id: $id, folderInput: $input) {
+        ...FolderFields
+    }
+}

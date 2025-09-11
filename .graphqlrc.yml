@@ -8,6 +8,8 @@ extensions:
         generates:
             ./graphql/__generated__/:
                 preset: client
+                config:
+                    unmaskFunctionName: unmask
         plugins:
             - client-preset
             - typescript
@@ -18,6 +20,7 @@ extensions:
             - nonOptionalTypenames: true
         presetConfig:
             gqlTagName: gql
+            unmaskFunctionName: unmask
         ignoreNoDocuments: true
         verbose: true
 overwrite: true

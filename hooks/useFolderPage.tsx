@@ -12,6 +12,7 @@ import useBackHandler from "./useBackHandler";
 import { UserMenu } from "@/components/user-menu";
 import FolderHeaderRight from "@/components/folder-header-right";
 import { FolderTitle } from "@/components/folder-title";
+import FolderOpsProvider from "@/providers/FolderOpsProvider";
 
 export default function useFolderPage(id: string | null = null) {
     const navigation =
@@ -38,7 +39,9 @@ export default function useFolderPage(id: string | null = null) {
                 headerLeft:
                     id !== null ? undefined : () => <UserMenu />,
                 headerRight: ({ tintColor }) => (
-                    <FolderHeaderRight tintColor={tintColor} />
+                    <FolderOpsProvider id={id}>
+                        <FolderHeaderRight tintColor={tintColor} />
+                    </FolderOpsProvider>
                 ),
             });
         }, [navigation, title, id]),

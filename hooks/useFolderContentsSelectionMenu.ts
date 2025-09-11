@@ -1,5 +1,5 @@
 import Icon from "@/components/Icon";
-import {useFolderOpsContext} from "@/providers/FolderOpsProvider";
+import { useFolderOpsContext } from "@/providers/FolderOpsProvider";
 import { useUI } from "@/providers/UIProvider";
 import { RootStackParamsList } from "@/Router";
 import { useNavigation } from "@react-navigation/native";
@@ -71,7 +71,7 @@ export default function useFolderContentsSelectionMenu() {
                 }
             },
             star: (items) => {
-                console.log("Starring items:", items);
+                folderOps.star(items, true);
             },
             offline: (items) => {
                 console.log("Making items available offline:", items);
@@ -101,7 +101,7 @@ export default function useFolderContentsSelectionMenu() {
                 console.log("Showing info for items:", items);
             },
         }),
-        [navigation, openDialog],
+        [folderOps, navigation, openDialog],
     );
 
     /**
