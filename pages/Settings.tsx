@@ -16,8 +16,13 @@ import {
 import { Text } from "@/components/ui/text";
 import store from "@/stores";
 import { observer } from "mobx-react-lite";
-import { useMemo } from "react";
-import { ColorSchemeName, ScrollView, View } from "react-native";
+import { memo, useMemo } from "react";
+import {
+    ColorSchemeName,
+    Pressable,
+    ScrollView,
+    View,
+} from "react-native";
 
 const ThemeBlock = observer(function ThemeBlock() {
     const label = useMemo(
@@ -29,16 +34,16 @@ const ThemeBlock = observer(function ThemeBlock() {
     );
 
     return (
-        <View className="gap-1.5">
+        <View className="gap-1.5 px-4">
             <Text>Theme</Text>
             <Dialog>
                 <DialogTrigger asChild>
-                    <View>
+                    <Pressable>
                         <Text>Choose theme</Text>
                         <Text>{label}</Text>
-                    </View>
+                    </Pressable>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="min-w-[336px]">
                     <DialogHeader>
                         <DialogTitle>Choose theme</DialogTitle>
                     </DialogHeader>
@@ -52,19 +57,74 @@ const ThemeBlock = observer(function ThemeBlock() {
                             )
                         }
                     >
-                        <View className="flex flex-row items-center gap-3">
-                            <RadioGroupItem value="light" id="r1" />
-                            <Label htmlFor="r1">Light</Label>
-                        </View>
-                        <View className="flex flex-row items-center gap-3">
-                            <RadioGroupItem value="dark" id="r2" />
-                            <Label htmlFor="r2">Dark</Label>
-                        </View>
-                        <View className="flex flex-row items-center gap-3">
-                            <RadioGroupItem value="system" id="r3" />
-                            <Label htmlFor="r3">System default</Label>
-                        </View>
+                        <DialogClose>
+                            <View className="flex flex-row items-center gap-3">
+                                <RadioGroupItem
+                                    value="light"
+                                    id="r1"
+                                />
+                                <Label nativeID="r1">Light</Label>
+                            </View>
+                        </DialogClose>
+                        <DialogClose>
+                            <View className="flex flex-row items-center gap-3">
+                                <RadioGroupItem
+                                    value="dark"
+                                    id="r2"
+                                />
+                                <Label nativeID="r2">Dark</Label>
+                            </View>
+                        </DialogClose>
+                        <DialogClose>
+                            <View className="flex flex-row items-center gap-3">
+                                <RadioGroupItem
+                                    value="system"
+                                    nativeID="r3"
+                                    id="r3"
+                                />
+                                <Label nativeID="r3">
+                                    System default
+                                </Label>
+                            </View>
+                        </DialogClose>
                     </RadioGroup>
+                </DialogContent>
+            </Dialog>
+        </View>
+    );
+});
+
+const CacheBlock = memo(function CacheBlock() {
+    return (
+        <View className="gap-1.5 px-4">
+            <Text variant="h4">Cache</Text>
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Pressable>
+                        <Text variant="h3">Clear cache</Text>
+                        <Text>
+                            Remove all cached documents for this
+                            account.
+                        </Text>
+                    </Pressable>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Clear cache</DialogTitle>
+                    </DialogHeader>
+                    <Text>Document cache will be cleared</Text>
+                    <DialogFooter>
+                        <DialogClose>
+                            <Button variant="ghost">
+                                <Text>Cancel</Text>
+                            </Button>
+                        </DialogClose>
+                        <DialogClose>
+                            <Button variant="ghost">
+                                <Text>Ok</Text>
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </View>
@@ -76,40 +136,7 @@ export default function SettingsPage() {
         <ScrollView>
             <View className="flex-col gap-6">
                 <ThemeBlock />
-                <View className="gap-1.5">
-                    <Text>Cache</Text>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <View>
-                                <Text>Clear cache</Text>
-                                <Text>
-                                    Remove all cached documents for
-                                    this account.
-                                </Text>
-                            </View>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Clear cache</DialogTitle>
-                            </DialogHeader>
-                            <Text>
-                                Document cache will be cleared
-                            </Text>
-                            <DialogFooter>
-                                <DialogClose>
-                                    <Button variant="ghost">
-                                        <Text>Cancel</Text>
-                                    </Button>
-                                </DialogClose>
-                                <DialogClose>
-                                    <Button variant="ghost">
-                                        <Text>Ok</Text>
-                                    </Button>
-                                </DialogClose>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                </View>
+                <CacheBlock />
             </View>
         </ScrollView>
     );

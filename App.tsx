@@ -49,7 +49,11 @@ function App() {
     }, []);
 
     const theme =
-        NAV_THEME[(store.ui.theme as "light" | "dark") || "light"];
+        NAV_THEME[
+            (store.ui.theme as "light" | "dark")
+                || colorSchemeName
+                || "light"
+        ];
 
     useEffect(() => {
         setBackgroundColorAsync(theme.colors.background);
