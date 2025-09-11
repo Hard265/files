@@ -11,12 +11,17 @@ import { View } from "react-native";
 import Icon from "./Icon";
 import store from "@/stores";
 import { observer } from "mobx-react-lite";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { UserAvatar } from "./user-avatar";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamsList } from "@/Router";
 
 export const UserMenu = observer(function UserMenu() {
     const { colors } = useTheme();
-    const navigation = useNavigation<NativeStack>()
+    const navigation =
+        useNavigation<
+            NativeStackNavigationProp<RootStackParamsList>
+        >();
     const popoverTriggerRef = React.useRef<TriggerRef>(null);
 
     async function onSignOut() {
@@ -59,7 +64,7 @@ export const UserMenu = observer(function UserMenu() {
                             variant="outline"
                             size="sm"
                             onPress={() => {
-                                // TODO: Navigate to account settings screen
+                                navigation.navigate("Settings");
                             }}
                         >
                             <Icon

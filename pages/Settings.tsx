@@ -8,11 +8,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+    RadioGroupItem,
+    RadioGroup,
+} from "@/components/ui/radio-group";
 import { Text } from "@/components/ui/text";
 import store from "@/stores";
 import { observer } from "mobx-react-lite";
 import { useMemo } from "react";
-import { ScrollView, View } from "react-native";
+import { ColorSchemeName, ScrollView, View } from "react-native";
 
 const ThemeBlock = observer(function ThemeBlock() {
     const label = useMemo(
@@ -37,7 +42,29 @@ const ThemeBlock = observer(function ThemeBlock() {
                     <DialogHeader>
                         <DialogTitle>Choose theme</DialogTitle>
                     </DialogHeader>
-                    <View></View>
+                    <RadioGroup
+                        value={store.ui.theme || "system"}
+                        onValueChange={(theme) =>
+                            store.ui.setTheme(
+                                theme === "system" ? null : (
+                                    (theme as ColorSchemeName)
+                                ),
+                            )
+                        }
+                    >
+                        <View className="flex flex-row items-center gap-3">
+                            <RadioGroupItem value="light" id="r1" />
+                            <Label htmlFor="r1">Light</Label>
+                        </View>
+                        <View className="flex flex-row items-center gap-3">
+                            <RadioGroupItem value="dark" id="r2" />
+                            <Label htmlFor="r2">Dark</Label>
+                        </View>
+                        <View className="flex flex-row items-center gap-3">
+                            <RadioGroupItem value="system" id="r3" />
+                            <Label htmlFor="r3">System default</Label>
+                        </View>
+                    </RadioGroup>
                 </DialogContent>
             </Dialog>
         </View>
