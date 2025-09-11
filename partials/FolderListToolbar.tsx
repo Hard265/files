@@ -11,7 +11,6 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import _ from "lodash";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/Icon";
 import useFolderContentsSelectionMenu from "@/hooks/useFolderContentsSelectionMenu";
@@ -36,7 +35,7 @@ function FolderListToolbar() {
                         <Button
                             onPress={() => store.ui.clearSelection()}
                             variant="outline"
-                            className="rounded-full px-3 py-1 gap-x-2"
+                            className="px-3 py-1 rounded-full gap-x-2"
                         >
                             <Icon name="close_line" size={18} />
                             <Text>

@@ -2,16 +2,16 @@ import { View } from "react-native";
 import useFolderPage from "@/hooks/useFolderPage";
 import { observer } from "mobx-react-lite";
 import FolderContents from "@/components/folder-contents";
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import { Text } from "@/components/ui/text";
 import { FolderContentsSkeleton } from "@/components/folder-contents-skeleton";
-import { FolderOpProvider } from "@/providers/FolderOpProvider";
 import { FolderContentsHeader } from "@/components/folder-contents-header";
+import FolderOpsProvider from "@/providers/FolderOpsProvider";
 
 function HomePage() {
-    const { ops } = useFolderPage(null);
+    const { id } = useFolderPage(null);
     return (
-        <FolderOpProvider options={ops}>
+        <FolderOpsProvider id={id}>
             <View className="flex-1">
                 <Suspense
                     fallback={
@@ -26,7 +26,7 @@ function HomePage() {
                     <FolderContents />
                 </Suspense>
             </View>
-        </FolderOpProvider>
+        </FolderOpsProvider>
     );
 }
 

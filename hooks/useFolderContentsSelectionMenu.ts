@@ -1,4 +1,5 @@
 import Icon from "@/components/Icon";
+import {useFolderOpsContext} from "@/providers/FolderOpsProvider";
 import { useUI } from "@/providers/UIProvider";
 import { RootStackParamsList } from "@/Router";
 import { useNavigation } from "@react-navigation/native";
@@ -37,6 +38,7 @@ export default function useFolderContentsSelectionMenu() {
             NativeStackNavigationProp<RootStackParamsList>
         >();
     const { openDialog } = useUI();
+    const folderOps = useFolderOpsContext();
 
     /**
      * Maps each action to a specific handler function.
@@ -57,10 +59,7 @@ export default function useFolderContentsSelectionMenu() {
                     cancelText: "Cancel",
                     confirmText: "Delete",
                     onConfirm: () => {
-                        console.log(
-                            "Confirmed deletion of items:",
-                            items,
-                        );
+                        folderOps.delete(items);
                     },
                 });
             },

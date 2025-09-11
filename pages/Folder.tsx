@@ -7,7 +7,7 @@ import {
     GetFolderQuery,
 } from "@/graphql/__generated__/graphql";
 import useFolderPage from "@/hooks/useFolderPage";
-import { FolderOpProvider } from "@/providers/FolderOpProvider";
+import FolderOpsProvider from "@/providers/FolderOpsProvider";
 import { RootStackParamsList } from "@/Router";
 import { useSuspenseQuery } from "@apollo/client/react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -23,9 +23,9 @@ function FolderPage({
             id: route.params.id,
         },
     });
-    const { ops } = useFolderPage(route.params.id);
+    const { id } = useFolderPage(route.params.id);
     return (
-        <FolderOpProvider options={ops}>
+        <FolderOpsProvider id={id}>
             <View className="flex-1">
                 <Suspense
                     fallback={
@@ -40,7 +40,7 @@ function FolderPage({
                     <FolderContents />
                 </Suspense>
             </View>
-        </FolderOpProvider>
+        </FolderOpsProvider>
     );
 }
 
