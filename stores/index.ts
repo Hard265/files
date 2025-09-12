@@ -1,3 +1,4 @@
+import { AppStore } from "./app";
 import { AuthStore } from "./auth";
 import { UIStore } from "./ui";
 
@@ -5,11 +6,12 @@ export * from "./auth";
 export * from "./ui";
 
 class Store {
+    app: AppStore;
     auth: AuthStore;
     ui: UIStore;
-    files: any;
 
     constructor() {
+        this.app = new AppStore();
         this.auth = new AuthStore();
         this.ui = new UIStore();
     }

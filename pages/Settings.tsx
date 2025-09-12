@@ -13,8 +13,10 @@ import {
     RadioGroupItem,
     RadioGroup,
 } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import store from "@/stores";
+import { DataUsage } from "@/stores/app";
 import { observer } from "mobx-react-lite";
 import { memo, useMemo } from "react";
 import {
@@ -131,12 +133,81 @@ const CacheBlock = memo(function CacheBlock() {
     );
 });
 
+const DataUsageBlock = observer(function DataUsageBlock() {
+    return (
+        <View className="gap-1.5 px-4">
+            <Text variant="h4">Data usage</Text>
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Pressable>
+                        <View>
+                            <Text variant="h3">
+                                Transfer files only over WiFi
+                            </Text>
+                            <Text>
+                                Uploading and updating of files will
+                                pause when WiFi connection is not
+                                available
+                            </Text>
+                        </View>
+                        <Switch
+                            checked={store.app.isWifiOnly}
+                            onCheckedChange={(checked) =>
+                                store.app.setDataUsage(
+                                    checked ?
+                                        DataUsage.WIFI_ONLY
+                                    :   DataUsage.ALL,
+                                )
+                            }
+                        />
+                    </Pressable>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Data usage warning</DialogTitle>
+                    </DialogHeader>
+                    <Text>
+                        Transfering files over mobile data may incur
+                        additional charges, depending on your mobile
+                        data plan.
+                    </Text>
+                    <DialogFooter>
+                        <DialogClose>
+                            <Button variant="ghost">
+                                <Text>Learn more</Text>
+                            </Button>
+                        </DialogClose>
+                        <DialogClose>
+                            <Button variant="ghost">
+                                <Text>Cancel</Text>
+                            </Button>
+                        </DialogClose>
+                        <DialogClose>
+                            <Button
+                                onPress={() => {
+                                    store.app.setDataUsage(
+                                        DataUsage.WIFI_ONLY,
+                                    );
+                                }}
+                                variant="ghost"
+                            >
+                                <Text>Ok</Text>
+                            </Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </View>
+    );
+});
+
 export default function SettingsPage() {
     return (
         <ScrollView>
             <View className="flex-col gap-6">
                 <ThemeBlock />
                 <CacheBlock />
+                <DataUsageBlock />
             </View>
         </ScrollView>
     );
