@@ -24,4 +24,7 @@ function Separator({
     );
 }
 
-export { Separator };
+type SeparatorProps = SeparatorPrimitive.RootProps;
+type SeparatorRef = SeparatorPrimitive.RootRef;
+
+export { Separator, type SeparatorProps, type SeparatorRef };
