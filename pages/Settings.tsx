@@ -10,6 +10,14 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import {
+    List,
+    ListGroup,
+    ListItem,
+    ListItemSubtitle,
+    ListItemTitle,
+    ListLabel,
+} from "@/components/ui/list";
+import {
     RadioGroupItem,
     RadioGroup,
 } from "@/components/ui/radio-group";
@@ -17,8 +25,9 @@ import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import store from "@/stores";
 import { DataUsage } from "@/stores/app";
+import { useApolloClient } from "@apollo/client/react";
 import { observer } from "mobx-react-lite";
-import { memo, useMemo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import {
     ColorSchemeName,
     Pressable,
@@ -36,14 +45,14 @@ const ThemeBlock = observer(function ThemeBlock() {
     );
 
     return (
-        <View className="gap-1.5 px-4">
-            <Text>Theme</Text>
+        <ListGroup>
+            <ListLabel>Theme</ListLabel>
             <Dialog>
                 <DialogTrigger asChild>
-                    <Pressable>
-                        <Text>Choose theme</Text>
-                        <Text>{label}</Text>
-                    </Pressable>
+                    <ListItem>
+                        <ListItemTitle>Choose theme</ListItemTitle>
+                        <ListItemSubtitle>{label}</ListItemSubtitle>
+                    </ListItem>
                 </DialogTrigger>
                 <DialogContent className="min-w-[336px]">
                     <DialogHeader>
@@ -92,23 +101,28 @@ const ThemeBlock = observer(function ThemeBlock() {
                     </RadioGroup>
                 </DialogContent>
             </Dialog>
-        </View>
+        </ListGroup>
     );
 });
 
 const CacheBlock = memo(function CacheBlock() {
+    const client = useApolloClient();
+    const clearCache = useCallback(() => {
+        client.clearStore();
+    }, [client]);
+
     return (
-        <View className="gap-1.5 px-4">
-            <Text variant="h4">Cache</Text>
+        <ListGroup>
+            <ListLabel>Cache</ListLabel>
             <Dialog>
                 <DialogTrigger asChild>
-                    <Pressable>
-                        <Text variant="h3">Clear cache</Text>
-                        <Text>
+                    <ListItem>
+                        <ListItemTitle>Clear cache</ListItemTitle>
+                        <ListItemSubtitle>
                             Remove all cached documents for this
                             account.
-                        </Text>
-                    </Pressable>
+                        </ListItemSubtitle>
+                    </ListItem>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
@@ -122,33 +136,36 @@ const CacheBlock = memo(function CacheBlock() {
                             </Button>
                         </DialogClose>
                         <DialogClose>
-                            <Button variant="ghost">
+                            <Button
+                                onPress={clearCache}
+                                variant="ghost"
+                            >
                                 <Text>Ok</Text>
                             </Button>
                         </DialogClose>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </View>
+        </ListGroup>
     );
 });
 
 const DataUsageBlock = observer(function DataUsageBlock() {
     return (
-        <View className="gap-1.5 px-4">
-            <Text variant="h4">Data usage</Text>
+        <ListGroup>
+            <ListLabel>Data usage</ListLabel>
             <Dialog>
                 <DialogTrigger asChild>
-                    <Pressable>
+                    <ListItem className="flex-row justify-between items-center">
                         <View>
-                            <Text variant="h3">
+                            <ListItemTitle>
                                 Transfer files only over WiFi
-                            </Text>
-                            <Text>
+                            </ListItemTitle>
+                            <ListItemSubtitle>
                                 Uploading and updating of files will
                                 pause when WiFi connection is not
                                 available
-                            </Text>
+                            </ListItemSubtitle>
                         </View>
                         <Switch
                             checked={store.app.isWifiOnly}
@@ -160,7 +177,7 @@ const DataUsageBlock = observer(function DataUsageBlock() {
                                 )
                             }
                         />
-                    </Pressable>
+                    </ListItem>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
@@ -197,18 +214,18 @@ const DataUsageBlock = observer(function DataUsageBlock() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </View>
+        </ListGroup>
     );
 });
 
 export default function SettingsPage() {
     return (
         <ScrollView>
-            <View className="flex-col gap-6">
+            <List>
                 <ThemeBlock />
                 <CacheBlock />
                 <DataUsageBlock />
-            </View>
+            </List>
         </ScrollView>
     );
 }
