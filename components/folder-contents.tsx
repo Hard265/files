@@ -44,8 +44,11 @@ function FolderContents() {
     )[];
     const onOpenHandler = useCallback(
         (id: string) => {
-            navigation.push("Folder", {
-                id,
+            navigation.push("Home", {
+                screen: "Folder",
+                params: {
+                    id,
+                },
             });
         },
         [navigation],
