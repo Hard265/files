@@ -10,7 +10,7 @@ export function UserAvatar({ email }: { email?: string }) {
     const [url, setUrl] = React.useState("");
 
     const avatarSize = React.useMemo(
-        () => PixelRatio.getPixelSizeForLayoutSize(18),
+        () => PixelRatio.getPixelSizeForLayoutSize(16),
         [],
     );
     React.useEffect(() => {

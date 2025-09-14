@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
     Popover,
+    PopoverClose,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
@@ -15,6 +16,8 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { UserAvatar } from "./user-avatar";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamsList } from "@/Router";
+import { Separator } from "./ui/separator";
+import { useApolloClient } from "@apollo/client/react";
 
 export const UserMenu = observer(function UserMenu() {
     const { colors } = useTheme();
@@ -22,11 +25,12 @@ export const UserMenu = observer(function UserMenu() {
         useNavigation<
             NativeStackNavigationProp<RootStackParamsList>
         >();
+    const client = useApolloClient();
     const popoverTriggerRef = React.useRef<TriggerRef>(null);
 
     async function onSignOut() {
+        store.auth.signout(client);
         popoverTriggerRef.current?.close();
-        // TODO: Sign out and navigate to sign in screen
     }
 
     return (
@@ -35,7 +39,7 @@ export const UserMenu = observer(function UserMenu() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full size-12"
+                    className="rounded-xl size-12"
                 >
                     <UserAvatar email={store.auth.user?.email} />
                 </Button>
@@ -43,12 +47,12 @@ export const UserMenu = observer(function UserMenu() {
             <PopoverContent
                 align="center"
                 side="bottom"
-                className="p-0 w-80"
+                className="w-auto p-0 max-w-[300px]"
             >
-                <View className="p-3 border-b border-border gap-3">
+                <View className="p-4 gap-3">
                     <View className="flex-row items-center gap-3">
                         <UserAvatar />
-                        <View className="flex-1">
+                        <View className="">
                             <Text className="font-medium leading-5">
                                 {store.auth.user?.email}
                             </Text>
@@ -59,53 +63,65 @@ export const UserMenu = observer(function UserMenu() {
                             :   null}
                         </View>
                     </View>
-                    <View className="flex-row flex-wrap gap-3 py-0.5">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onPress={() => {
-                                navigation.navigate("Settings");
-                            }}
-                        >
-                            <Icon
-                                name="settings_1_line"
-                                size={20}
-                                color={colors.text}
-                            />
-                            <Text>Settings</Text>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1"
-                            onPress={onSignOut}
-                        >
-                            <Icon
-                                name="exit_line"
-                                size={20}
-                                color={colors.text}
-                            />
-                            <Text>Sign Out</Text>
-                        </Button>
-                    </View>
+                    <Button
+                        className="self-end justify-start px-4  bg-green-500 gap-3"
+                        variant="default"
+                        size="sm"
+                    >
+                        <Text>Upgrade to Pro</Text>
+                    </Button>
                 </View>
+                <Separator />
+                <PopoverClose asChild>
+                    <Button
+                        variant="ghost"
+                        className="justify-start px-4 rounded-none gap-3"
+                        onPress={() => {
+                            navigation.navigate("Settings");
+                        }}
+                    >
+                        <Text>Settings</Text>
+                    </Button>
+                </PopoverClose>
+                <PopoverClose asChild>
+                    <Button
+                        variant="ghost"
+                        className="justify-start px-4 rounded-none gap-3"
+                    >
+                        <Text>Manage account</Text>
+                    </Button>
+                </PopoverClose>
+                <PopoverClose asChild>
+                    <Button
+                        variant="ghost"
+                        className="justify-start px-4 rounded-none gap-3"
+                        onPress={onSignOut}
+                    >
+                        <Text>Log out</Text>
+                    </Button>
+                </PopoverClose>
+                <Separator />
                 <Button
                     variant="ghost"
-                    size="lg"
-                    className="justify-start h-16 px-3 rounded-none gap-3 rounded-b-md sm:h-14"
-                    onPress={() => {
-                        // TODO: Navigate to add account screen
-                    }}
+                    className="justify-start px-4 rounded-none gap-3 rounded-b-md"
                 >
-                    <View className="items-center justify-center size-10">
-                        <View className="items-center justify-center border border-dashed rounded-full border-border bg-muted/50 size-7">
-                            <Icon
-                                name="add_circle_line"
-                                size={20}
-                                color={colors.text}
-                            />
-                        </View>
-                    </View>
+                    <Icon
+                        name="globe_2_line"
+                        size={20}
+                        color={colors.text}
+                    />
+                    <Text>English (United States)</Text>
+                </Button>
+                <Separator />
+                <Button
+                    variant="ghost"
+                    className="justify-start px-4 rounded-none gap-3 rounded-b-md"
+                >
+                    <Icon
+                        name="add_circle_line"
+                        size={20}
+                        color={colors.text}
+                    />
                     <Text>Add account</Text>
                 </Button>
             </PopoverContent>

@@ -18,7 +18,7 @@ export function Avatar({
     return (
         <View
             className={cn(
-                "justify-center items-center overflow-hidden rounded-full",
+                "justify-center items-center overflow-hidden rounded-xl",
                 className,
             )}
         >

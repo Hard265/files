@@ -12,6 +12,7 @@ import React, { ComponentProps } from "react";
 import { View } from "react-native";
 import { ItemsMenu } from "@/components/folder-contents-items-menu";
 import { PlusMenu } from "@/components/plus-menu";
+import { UserMenu } from "./user-menu";
 
 function FolderHeaderRight({ tintColor }: { tintColor?: string }) {
     const { colors } = useTheme();
@@ -22,10 +23,6 @@ function FolderHeaderRight({ tintColor }: { tintColor?: string }) {
         name: string;
         icon: ComponentProps<typeof Icon>["name"];
     }[] = _.compact([
-        {
-            name: "search",
-            icon: "search_line",
-        },
         route.params?.id && {
             name: "share",
             icon: "user_add_2_line",
@@ -33,7 +30,7 @@ function FolderHeaderRight({ tintColor }: { tintColor?: string }) {
     ]);
 
     return (
-        <View className="flex-row -mr-2 gap-x-2">
+        <View className="flex-row items-center -mr-2 gap-x-2">
             {items.map((item) => (
                 <IconButton
                     key={item.name}
@@ -43,9 +40,9 @@ function FolderHeaderRight({ tintColor }: { tintColor?: string }) {
                 />
             ))}
             <PlusMenu />
-            {route.params?.id && (
+            {route.params?.id ?
                 <ItemsMenu refs={[`Folder:${route.params.id}`]} />
-            )}
+            :   <UserMenu />}
         </View>
     );
 }

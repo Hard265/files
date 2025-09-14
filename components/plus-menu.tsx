@@ -1,5 +1,5 @@
 import { useTheme } from "@react-navigation/native";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { IconButton } from "./Button";
 import Icon from "./Icon";
 import { Text } from "./ui/text";
@@ -17,11 +17,13 @@ export function PlusMenu() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <IconButton
-                    name="add_line"
-                    size={22}
-                    color={colors.text}
-                />
+                <Pressable className="p-2.5">
+                    <Icon
+                        name="add_line"
+                        size={22}
+                        color={colors.text}
+                    />
+                </Pressable>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuGroup>
