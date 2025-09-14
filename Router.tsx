@@ -13,6 +13,9 @@ import ForgotPasswordPage from "./pages/ForgotPassword";
 import ManageAccessPage from "./pages/ManageAccess";
 import { SharePage } from "./pages/Share";
 import SettingsPage from "./pages/Settings";
+import FolderPageHeader from "./components/folder-page-header";
+import { createDrawerNavigator } from "@react-navigation/drawer";
+import FolderDrawerContent from "./components/folder-drawer";
 
 export type RootStackParamsList = {
     SignIn: undefined;
@@ -22,8 +25,14 @@ export type RootStackParamsList = {
     };
     ForgotPassword: undefined;
     Home: undefined;
+    Root: {
+        screen: "Folder";
+    };
     Folder: {
-        id: string;
+        screen: "Folder";
+        params: {
+            id: string;
+        };
     };
     ManageAccess: {
         ref: __ref;
@@ -35,6 +44,40 @@ export type RootStackParamsList = {
     Settings: undefined;
 };
 
+// --- Folder Stack ---
+const FolderStack = createNativeStackNavigator({
+    screens: {
+        Folder: {
+            screen: FolderPage,
+            linking: {
+                path: "/folders/:id",
+            },
+        },
+    },
+    screenOptions: {
+        headerShown: false,
+    },
+});
+
+// --- Drawer ---
+const FolderDrawer = createDrawerNavigator({
+    screens: {
+        Home: { screen: HomePage, linking: { path: "/" } },
+        Folder: { screen: FolderStack },
+    },
+    drawerContent: FolderDrawerContent,
+    screenOptions: ({ navigation }) => ({
+        header: (props) => (
+            <FolderPageHeader
+                {...props}
+                navigation={navigation as any}
+            />
+        ),
+        popToTopOnBlur: false,
+    }),
+});
+
+// --- Root Stack ---
 const RootStack = createNativeStackNavigator({
     groups: {
         Unauthenticated: {
@@ -42,27 +85,23 @@ const RootStack = createNativeStackNavigator({
             screens: {
                 SignIn: {
                     screen: SignInPage,
-                    options: {
-                        title: "Sign in",
-                    },
+                    options: { title: "Sign in" },
+                    linking: { path: "/sign-in" },
                 },
                 SignUp: {
                     screen: SignUpPage,
-                    options: {
-                        title: "Sign up",
-                    },
+                    options: { title: "Sign up" },
+                    linking: { path: "/sign-up" },
                 },
                 VerifyEmail: {
                     screen: VerifyEmailPage,
-                    options: {
-                        title: "Verify email",
-                    },
+                    options: { title: "Verify email" },
+                    linking: { path: "/verify-email" },
                 },
                 ForgotPassword: {
                     screen: ForgotPasswordPage,
-                    options: {
-                        title: "Forgot password",
-                    },
+                    options: { title: "Forgot password" },
+                    linking: { path: "/forgot-password" },
                 },
             },
         },
@@ -70,22 +109,14 @@ const RootStack = createNativeStackNavigator({
             if: useIsAuthenticated,
             screens: {
                 Home: {
-                    screen: HomePage,
-                },
-                Folder: {
-                    screen: FolderPage,
-                    options: {
-                        animation: "slide_from_right",
-                    },
+                    screen: FolderDrawer,
+                    options: { headerShown: false },
                 },
                 ManageAccess: {
                     screen: ManageAccessPage,
-                    options: {
-                        title: "Manage access",
-                    },
-                    initialParams: {
-                        tab: "people",
-                    },
+                    options: { title: "Manage access" },
+                    initialParams: { tab: "people" },
+                    linking: { path: "/manage-access/:tab" },
                 },
                 Share: {
                     screen: SharePage,
@@ -93,15 +124,17 @@ const RootStack = createNativeStackNavigator({
                         presentation: "formSheet",
                         title: "Share",
                     },
+                    linking: { path: "/share" },
                 },
-                Settings: SettingsPage,
+                Settings: {
+                    screen: SettingsPage,
+                    linking: { path: "/settings" },
+                },
             },
         },
     },
     screenOptions: ({ theme }) => ({
-        headerStyle: {
-            backgroundColor: theme.colors.background,
-        },
+        headerStyle: { backgroundColor: theme.colors.background },
         headerShadowVisible: false,
         freezeOnBlur: true,
     }),
