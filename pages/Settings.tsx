@@ -128,17 +128,17 @@ const CacheBlock = memo(function CacheBlock() {
                     <DialogHeader>
                         <DialogTitle>Clear cache</DialogTitle>
                     </DialogHeader>
-                    <Text>Document cache will be cleared</Text>
+                    <Text>Documents cache will be cleared</Text>
                     <DialogFooter>
-                        <DialogClose>
+                        <DialogClose asChild>
                             <Button variant="ghost">
                                 <Text>Cancel</Text>
                             </Button>
                         </DialogClose>
-                        <DialogClose>
+                        <DialogClose asChild>
                             <Button
                                 onPress={clearCache}
-                                variant="ghost"
+                                variant="destructive"
                             >
                                 <Text>Ok</Text>
                             </Button>
@@ -156,8 +156,8 @@ const DataUsageBlock = observer(function DataUsageBlock() {
             <ListLabel>Data usage</ListLabel>
             <Dialog>
                 <DialogTrigger asChild>
-                    <ListItem className="flex-row justify-between items-center">
-                        <View>
+                    <ListItem className="flex-row items-center justify-between">
+                        <View className="flex flex-col flex-1">
                             <ListItemTitle>
                                 Transfer files only over WiFi
                             </ListItemTitle>
@@ -188,18 +188,18 @@ const DataUsageBlock = observer(function DataUsageBlock() {
                         additional charges, depending on your mobile
                         data plan.
                     </Text>
-                    <DialogFooter>
-                        <DialogClose>
+                    <DialogFooter className="flex-row justify-between">
+                        <DialogClose asChild>
                             <Button variant="ghost">
                                 <Text>Learn more</Text>
                             </Button>
                         </DialogClose>
-                        <DialogClose>
+                        <DialogClose asChild>
                             <Button variant="ghost">
                                 <Text>Cancel</Text>
                             </Button>
                         </DialogClose>
-                        <DialogClose>
+                        <DialogClose asChild>
                             <Button
                                 onPress={() => {
                                     store.app.setDataUsage(
