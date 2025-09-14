@@ -25,14 +25,8 @@ export type RootStackParamsList = {
     };
     ForgotPassword: undefined;
     Home: undefined;
-    Root: {
-        screen: "Folder";
-    };
     Folder: {
-        screen: "Folder";
-        params: {
-            id: string;
-        };
+        id: string;
     };
     ManageAccess: {
         ref: __ref;
