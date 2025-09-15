@@ -1,26 +1,22 @@
-import { RootStackParamsList } from "@/Router";
 import { useTheme } from "@react-navigation/native";
-import {
-    NativeStackHeaderProps,
-    NativeStackNavigationProp,
-} from "@react-navigation/native-stack";
-import { memo, useCallback, useMemo, useState } from "react";
+import React, { memo, useCallback, useRef } from "react";
 import {
     getDefaultHeaderHeight,
     HeaderBackButton,
 } from "@react-navigation/elements";
 import Animated, {
     interpolateColor,
-    runOnJS,
     SlideInRight,
     SlideOutRight,
-    useAnimatedReaction,
     useAnimatedStyle,
     useSharedValue,
     withTiming,
 } from "react-native-reanimated";
-import { Pressable, TextInput, useWindowDimensions } from "react-native";
+import { Pressable, TextInput, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { observer } from "mobx-react-lite";
+
+// Local Imports
 import { UserMenu } from "@/components/user-menu";
 import { PlusMenu } from "@/components/plus-menu";
 import Icon from "@/components/Icon";
@@ -28,71 +24,66 @@ import { cn } from "@/lib/cn";
 import { THEME } from "@/lib/theme";
 import { DrawerHeaderProps } from "@react-navigation/drawer";
 import useBackHandler from "@/hooks/useBackHandler";
-import React from "react";
+import { infolderSubject } from "@/pages/Folder";
+import store from "@/stores";
 
 const HEADER_ANIMATION_DURATION = 250;
 
-const FolderPageHeader = memo(function Header({
+const FolderPageHeader = observer(function Header({
     navigation,
     route,
-    ...props
 }: DrawerHeaderProps) {
+    const theme = useTheme();
     const dimensions = useWindowDimensions();
     const insets = useSafeAreaInsets();
     const headerHeight = getDefaultHeaderHeight(dimensions, false, insets.top);
 
-    const searchRef = React.useRef<TextInput>(null);
+    const searchInputRef = useRef<TextInput>(null);
+    const searchOpen = useSharedValue(store.ui.searchOpen ? 1 : 0);
 
-    const theme = useTheme();
-    const [isFocusedState, setIsFocusedState] = useState(false);
-    const searchIsFocused = useSharedValue(false);
+    const closeSearch = useCallback(() => {
+        store.ui.setSearchOpen(false);
+        searchOpen.value = withTiming(0, {
+            duration: HEADER_ANIMATION_DURATION,
+        });
+        searchInputRef.current?.blur();
+    }, [searchOpen]);
+
+    const openSearch = useCallback(() => {
+        store.ui.setSearchOpen(true);
+        searchOpen.value = withTiming(1, {
+            duration: HEADER_ANIMATION_DURATION,
+        });
+    }, [searchOpen]);
+
+    useBackHandler(store.ui.searchOpen, () => {
+        closeSearch();
+        return true; // Prevent default back action
+    });
+
+    const drawerHandler = useCallback(() => {
+        if (store.ui.searchOpen) {
+            closeSearch();
+            return;
+        }
+        navigation.openDrawer();
+    }, [navigation, closeSearch]);
 
     const headerStyle = useAnimatedStyle(() => {
         "worklet";
         return {
-            backgroundColor: withTiming(
-                interpolateColor(
-                    searchIsFocused.value ? 1 : 0,
-                    [0, 1],
-                    [
-                        theme.colors.background,
-                        THEME[theme.dark ? "dark" : "light"].accent,
-                    ],
-                ),
-                {
-                    duration: HEADER_ANIMATION_DURATION,
-                },
+            backgroundColor: interpolateColor(
+                searchOpen.value,
+                [0, 1],
+                [
+                    theme.colors.background,
+                    THEME[theme.dark ? "dark" : "light"].accent,
+                ],
             ),
         };
     });
 
-    const onFocusChange = useCallback(
-        (focused: boolean) => {
-            "worklet";
-            searchIsFocused.value = focused;
-        },
-        [searchIsFocused],
-    );
-
-    useAnimatedReaction(
-        () => searchIsFocused.value,
-        (current) => {
-            runOnJS(setIsFocusedState)(current);
-        },
-    );
-
-    useBackHandler(isFocusedState, () => {
-        searchIsFocused.value = false;
-        return true;
-    });
-
-    const drawerHandler = useCallback(() => {
-        if (isFocusedState) {
-            searchRef.current?.blur();
-            return;
-        }
-        navigation.openDrawer();
-    }, [isFocusedState, navigation]);
+    const isHome = route.name === "Home";
 
     return (
         <Animated.View
@@ -105,11 +96,15 @@ const FolderPageHeader = memo(function Header({
             ]}
             className="flex-row items-center justify-between px-2"
         >
-            {route.name === "Home" ?
+            {isHome ?
                 <HeaderBackButton
                     backImage={() => (
                         <Icon
-                            name={isFocusedState ? "close_line" : "menu_line"}
+                            name={
+                                store.ui.searchOpen ?
+                                    "close_line"
+                                :   "menu_line"
+                            }
                             size={24}
                         />
                     )}
@@ -117,17 +112,20 @@ const FolderPageHeader = memo(function Header({
                     tintColor={theme.colors.text}
                 />
             :   <HeaderBackButton
-                    onPress={() => {
-                        navigation.goBack();
-                    }}
+                    onPress={() => infolderSubject.next("GO_BACK")}
                     tintColor={theme.colors.text}
                 />
             }
-            <Animated.View className="items-center justify-center flex-1">
+
+            <View className="items-center justify-center flex-1">
                 <TextInput
-                    ref={searchRef}
-                    onFocus={() => onFocusChange(true)}
-                    onBlur={() => onFocusChange(false)}
+                    ref={searchInputRef}
+                    onFocus={openSearch}
+                    onBlur={(e) => {
+                        if (!e.nativeEvent.text) {
+                            closeSearch();
+                        }
+                    }}
                     placeholder="Search"
                     className={cn(
                         "dark:bg-input/30 border-input bg-background text-foreground flex h-10 w-full min-w-0 flex-row items-center rounded-md border px-3 py-1 text-base leading-5 shadow-sm shadow-black/5 sm:h-9",
@@ -138,17 +136,23 @@ const FolderPageHeader = memo(function Header({
                         THEME[theme.dark ? "dark" : "light"].mutedForeground
                     }
                 />
-            </Animated.View>
-            {!isFocusedState && (
+            </View>
+
+            {!store.ui.searchOpen && (
                 <Animated.View
                     entering={SlideInRight.duration(HEADER_ANIMATION_DURATION)}
                     exiting={SlideOutRight.duration(HEADER_ANIMATION_DURATION)}
                     className="flex-row items-center justify-center pl-3"
                 >
                     <PlusMenu />
-                    <Pressable className="p-2.5">
-                        <Icon name="user_add_line" size={24} />
-                    </Pressable>
+                    {!isHome && (
+                        <Pressable
+                            onPress={() => alert("Add user pressed!")}
+                            className="p-2.5"
+                        >
+                            <Icon name="user_add_line" size={24} />
+                        </Pressable>
+                    )}
                     {!route.params?.id && <UserMenu />}
                 </Animated.View>
             )}

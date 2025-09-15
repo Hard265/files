@@ -11,19 +11,20 @@ import useFolderPage from "@/hooks/useFolderPage";
 import FolderOpsProvider from "@/providers/FolderOpsProvider";
 import { RootStackParamsList } from "@/Router";
 import { useSuspenseQuery } from "@apollo/client/react";
-import { DrawerScreenProps } from "@react-navigation/drawer";
+import { useFocusEffect } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import _ from "lodash";
 import { observer } from "mobx-react-lite";
-import { Suspense, useCallback, useEffect } from "react";
+import { Suspense, useCallback } from "react";
 import { View } from "react-native";
+import { Subject } from "rxjs";
 
-const history: string[] = [];
+export const infolderSubject = new Subject<"GO_BACK">();
+const infolderSubject$ = infolderSubject.asObservable();
 
 function FolderPage({
     route,
     navigation,
-}: DrawerScreenProps<RootStackParamsList, "Folder">) {
+}: NativeStackScreenProps<RootStackParamsList, "Folder">) {
     useSuspenseQuery<GetFolderQuery>(GetFolderDocument, {
         variables: {
             id: route.params.id,
@@ -31,19 +32,18 @@ function FolderPage({
     });
     const { id } = useFolderPage(route.params.id);
 
-    useEffect(() => {
-        if (!history.includes(id!)) {
-            history.push(id!);
-        }
-    }, [id]);
-
-    useBackHandler(history.length > 1, () => {
-        let to = _.last(history);
-        if (to) {
-            navigation.jumpTo("Folder", { id: to });
-        }
-        history.pop();
-    });
+    useFocusEffect(
+        useCallback(() => {
+            const subscriber = infolderSubject$.subscribe((payload) => {
+                if (payload === "GO_BACK") {
+                    navigation.goBack();
+                }
+            });
+            return () => {
+                subscriber.unsubscribe();
+            };
+        }, [navigation]),
+    );
 
     return (
         <FolderOpsProvider id={id}>
@@ -58,7 +58,7 @@ function FolderPage({
                     <FolderContentsHeader />
                 </Suspense>
                 <Suspense fallback={<FolderContentsSkeleton />}>
-                    <FolderContents navigation={navigation} />
+                    <FolderContents navigation={navigation} route={route}/>
                 </Suspense>
             </View>
         </FolderOpsProvider>

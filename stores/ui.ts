@@ -23,7 +23,7 @@ export class UIStore {
     listView: ListView = "compact";
     selectedItems: Set<SelectedItem> = new Set();
     sort: sortOption = "name:asc";
-    searchFocused: boolean = false;
+    searchOpen: boolean = false;
 
     constructor() {
         makeObservable(this, {
@@ -31,7 +31,7 @@ export class UIStore {
             listView: observable,
             selectedItems: observable,
             sort: observable,
-            searchFocused: observable,
+            searchOpen: observable,
             isCompact: computed,
             selectionCount: computed,
             sortField: computed,
@@ -40,7 +40,7 @@ export class UIStore {
             toggleSelectedItem: action,
             clearSelection: action,
             setSort: action,
-            setSearchFocused: action,
+            setSearchOpen: action,
         });
     }
 
@@ -69,9 +69,7 @@ export class UIStore {
     }
 
     toggleSelectedItem(item: SelectedItem) {
-        this.selectedItems = new Set(
-            _.xor([...this.selectedItems], [item]),
-        );
+        this.selectedItems = new Set(_.xor([...this.selectedItems], [item]));
     }
 
     clearSelection() {
@@ -82,7 +80,7 @@ export class UIStore {
         this.sort = sort;
     }
 
-    setSearchFocused(focused: boolean) {
-        this.searchFocused = focused;
+    setSearchOpen(open: boolean) {
+        this.searchOpen = open;
     }
 }

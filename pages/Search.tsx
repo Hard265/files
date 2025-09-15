@@ -3,7 +3,7 @@ import store from "@/stores";
 import { observer } from "mobx-react-lite";
 
 function SearchPage() {
-    return store.ui.searchFocused ? <Text>Search Page</Text> : <></>;
+    return store.ui.searchOpen ? <Text>Search Page</Text> : <></>;
 }
 
 export default observer(SearchPage);

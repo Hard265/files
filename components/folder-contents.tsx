@@ -8,21 +8,21 @@ import { useSuspenseQuery } from "@apollo/client/react";
 import { AnimatedFlashList as FlashList } from "@shopify/flash-list";
 import { Suspense, useCallback, useTransition } from "react";
 import ErrorBoundary from "./ErrorBoundary";
-import {
-    RouteProp,
-    StackActions,
-    useNavigation,
-    useRoute,
-} from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamsList } from "@/Router";
 import { Text } from "./ui/text";
 import { RefreshControl, View } from "react-native";
 import { FolderContentsItemSkeleton } from "./folder-contents-item-skeleton";
 import FolderContentsEmpty from "./folder-contents-empty";
 import _ from "lodash";
+import { DrawerScreenProps } from "@react-navigation/drawer";
 
-function FolderContents({ navigation }: any) {
+function FolderContents({
+    navigation,
+}:
+    | DrawerScreenProps<RootStackParamsList>
+    | NativeStackScreenProps<RootStackParamsList>) {
     const route = useRoute<RouteProp<RootStackParamsList, "Folder">>();
     const [isPending, startTransition] = useTransition();
     const { data, refetch } = useSuspenseQuery(GetFolderContentsDocument, {
@@ -31,9 +31,17 @@ function FolderContents({ navigation }: any) {
         },
     });
     const items = [...data.folders, ...data.files] as (File | Folder)[];
+    console.log(navigation.getState().type);
     const onOpenHandler = useCallback(
         (id: string) => {
-            navigation.jumpTo("Folder",  { id });
+            if (navigation.getState().type === "drawer") {
+                navigation.jumpTo("FolderStack", {
+                    screen: "Folder",
+                    params: { id },
+                });
+            } else {
+                navigation.push("Folder", { id });
+            }
         },
         [navigation],
     );

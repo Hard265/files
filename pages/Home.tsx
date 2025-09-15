@@ -2,7 +2,7 @@ import { View } from "react-native";
 import useFolderPage from "@/hooks/useFolderPage";
 import { observer } from "mobx-react-lite";
 import FolderContents from "@/components/folder-contents";
-import { Suspense, useCallback } from "react";
+import { Suspense } from "react";
 import { Text } from "@/components/ui/text";
 import { FolderContentsSkeleton } from "@/components/folder-contents-skeleton";
 import { FolderContentsHeader } from "@/components/folder-contents-header";
