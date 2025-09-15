@@ -19,11 +19,7 @@ import Animated, {
     useSharedValue,
     withTiming,
 } from "react-native-reanimated";
-import {
-    Pressable,
-    TextInput,
-    useWindowDimensions,
-} from "react-native";
+import { Pressable, TextInput, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { UserMenu } from "@/components/user-menu";
 import { PlusMenu } from "@/components/plus-menu";
@@ -40,16 +36,10 @@ const FolderPageHeader = memo(function Header({
     navigation,
     route,
     ...props
-}: {
-    navigation: NativeStackNavigationProp<RootStackParamsList>;
-} & DrawerHeaderProps) {
+}: DrawerHeaderProps) {
     const dimensions = useWindowDimensions();
     const insets = useSafeAreaInsets();
-    const headerHeight = getDefaultHeaderHeight(
-        dimensions,
-        false,
-        insets.top,
-    );
+    const headerHeight = getDefaultHeaderHeight(dimensions, false, insets.top);
 
     const searchRef = React.useRef<TextInput>(null);
 
@@ -115,15 +105,11 @@ const FolderPageHeader = memo(function Header({
             ]}
             className="flex-row items-center justify-between px-2"
         >
-            {route.name === "Root" ?
+            {route.name === "Home" ?
                 <HeaderBackButton
                     backImage={() => (
                         <Icon
-                            name={
-                                isFocusedState ? "close_line" : (
-                                    "menu_line"
-                                )
-                            }
+                            name={isFocusedState ? "close_line" : "menu_line"}
                             size={24}
                         />
                     )}
@@ -149,19 +135,14 @@ const FolderPageHeader = memo(function Header({
                     keyboardType="web-search"
                     returnKeyType="search"
                     placeholderTextColor={
-                        THEME[theme.dark ? "dark" : "light"]
-                            .mutedForeground
+                        THEME[theme.dark ? "dark" : "light"].mutedForeground
                     }
                 />
             </Animated.View>
             {!isFocusedState && (
                 <Animated.View
-                    entering={SlideInRight.duration(
-                        HEADER_ANIMATION_DURATION,
-                    )}
-                    exiting={SlideOutRight.duration(
-                        HEADER_ANIMATION_DURATION,
-                    )}
+                    entering={SlideInRight.duration(HEADER_ANIMATION_DURATION)}
+                    exiting={SlideOutRight.duration(HEADER_ANIMATION_DURATION)}
                     className="flex-row items-center justify-center pl-3"
                 >
                     <PlusMenu />

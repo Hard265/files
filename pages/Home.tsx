@@ -2,14 +2,16 @@ import { View } from "react-native";
 import useFolderPage from "@/hooks/useFolderPage";
 import { observer } from "mobx-react-lite";
 import FolderContents from "@/components/folder-contents";
-import { Suspense } from "react";
+import { Suspense, useCallback } from "react";
 import { Text } from "@/components/ui/text";
 import { FolderContentsSkeleton } from "@/components/folder-contents-skeleton";
 import { FolderContentsHeader } from "@/components/folder-contents-header";
 import FolderOpsProvider from "@/providers/FolderOpsProvider";
+import { DrawerScreenProps } from "@react-navigation/drawer";
 
-function HomePage() {
+function HomePage({ navigation, route }: DrawerScreenProps<any>) {
     const { id } = useFolderPage(null);
+
     return (
         <FolderOpsProvider id={id}>
             <View className="flex-1">
@@ -23,7 +25,7 @@ function HomePage() {
                     <FolderContentsHeader />
                 </Suspense>
                 <Suspense fallback={<FolderContentsSkeleton />}>
-                    <FolderContents />
+                    <FolderContents navigation={navigation} />
                 </Suspense>
             </View>
         </FolderOpsProvider>

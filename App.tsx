@@ -1,12 +1,11 @@
 import "@/global.css";
-import Navigation from "@/Router";
 import { ApolloProvider } from "@apollo/client/react";
-import { ThemeProvider } from "@react-navigation/native";
+import { NavigationContainer, ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
 import * as Font from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import { setBackgroundColorAsync } from "expo-system-ui";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import FatalError from "./components/FatalError";
@@ -18,10 +17,17 @@ import { ErrorBoundary } from "react-error-boundary";
 import store from "./stores";
 import { useColorScheme as useNWColorScheme } from "nativewind";
 import { observer } from "mobx-react-lite";
+import RootStack from "./navigators/Root";
 
 SplashScreen.preventAutoHideAsync();
 
-function App() {
+/**
+ * The root component of the app, responsible for loading fonts and setting
+ * the color scheme.
+ *
+ * @returns {JSX.Element | null} The root component of the app.
+ */
+function App(): JSX.Element | null {
     const colorSchemeName = useColorScheme();
     const { setColorScheme } = useNWColorScheme();
     const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -50,9 +56,7 @@ function App() {
 
     const theme =
         NAV_THEME[
-            (store.ui.theme as "light" | "dark")
-                || colorSchemeName
-                || "light"
+            (store.ui.theme as "light" | "dark") || colorSchemeName || "light"
         ];
 
     useEffect(() => {
@@ -66,25 +70,21 @@ function App() {
     if (!fontsLoaded) return null;
 
     return (
-        <ErrorBoundary fallback={<FatalError />}>
+        // <ErrorBoundary fallback={<FatalError />}>
             <ThemeProvider value={theme}>
                 <ApolloProvider client={client}>
                     <GestureHandlerRootView style={{ flex: 1 }}>
                         <UIProvider>
-                            <Navigation
-                                onStateChange={() => {}}
-                                theme={theme}
-                            />
+                            <NavigationContainer theme={theme}>
+                                <RootStack />
+                            </NavigationContainer>
                             <PortalHost />
                         </UIProvider>
                     </GestureHandlerRootView>
                 </ApolloProvider>
-                <StatusBar
-                    animated
-                    style={theme.dark ? "light" : "dark"}
-                />
+                <StatusBar animated style={theme.dark ? "light" : "dark"} />
             </ThemeProvider>
-        </ErrorBoundary>
+        // </ErrorBoundary>
     );
 }
 

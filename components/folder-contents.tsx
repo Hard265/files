@@ -10,6 +10,7 @@ import { Suspense, useCallback, useTransition } from "react";
 import ErrorBoundary from "./ErrorBoundary";
 import {
     RouteProp,
+    StackActions,
     useNavigation,
     useRoute,
 } from "@react-navigation/native";
@@ -21,35 +22,18 @@ import { FolderContentsItemSkeleton } from "./folder-contents-item-skeleton";
 import FolderContentsEmpty from "./folder-contents-empty";
 import _ from "lodash";
 
-function FolderContents() {
-    const route =
-        useRoute<RouteProp<RootStackParamsList, "Folder">>();
-    const navigation =
-        useNavigation<
-            NativeStackNavigationProp<RootStackParamsList>
-        >();
+function FolderContents({ navigation }: any) {
+    const route = useRoute<RouteProp<RootStackParamsList, "Folder">>();
     const [isPending, startTransition] = useTransition();
-    const { data, refetch } = useSuspenseQuery(
-        GetFolderContentsDocument,
-        {
-            variables: {
-                folderId: _.defaultTo(route.params?.id, null),
-            },
+    const { data, refetch } = useSuspenseQuery(GetFolderContentsDocument, {
+        variables: {
+            folderId: _.defaultTo(route.params?.id, null),
         },
-    );
-
-    const items = [...data.folders, ...data.files] as (
-        | File
-        | Folder
-    )[];
+    });
+    const items = [...data.folders, ...data.files] as (File | Folder)[];
     const onOpenHandler = useCallback(
         (id: string) => {
-            navigation.push("Home", {
-                screen: "Folder",
-                params: {
-                    id,
-                },
-            });
+            navigation.jumpTo("Folder",  { id });
         },
         [navigation],
     );
