@@ -34,7 +34,7 @@ const parseItemRef = (ref: string): [ItemType | null, string | null] => {
     return [type, id];
 };
 
-export default function ManageAccessPage({
+export default function AccessPage({
     navigation,
     route,
 }: NativeStackScreenProps<RootStackParamList, "ManageAccess">) {

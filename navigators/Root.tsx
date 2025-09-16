@@ -1,6 +1,6 @@
 import { useIsAuthenticated } from "@/hooks/useSession";
 import ForgotPasswordPage from "@/pages/ForgotPassword";
-import ManageAccessPage from "@/pages/ManageAccess";
+import AccessPage from "@/pages/ManageAccess";
 import SettingsPage from "@/pages/Settings";
 import { SharePage } from "@/pages/Share";
 import SignInPage from "@/pages/SignIn";
@@ -51,7 +51,7 @@ function RootStack() {
                     />
                     <Stack.Screen
                         name="ManageAccess"
-                        component={ManageAccessPage}
+                        component={AccessPage}
                     />
                     <Stack.Screen name="Share" component={SharePage} />
                     <Stack.Screen name="Settings" component={SettingsPage} />

@@ -20,10 +20,12 @@ function FolderContentsItem({
     id,
     type,
     onOpen,
+    onRequestRename,
 }: {
     id: string;
     type: ItemUnion["__typename"];
     onOpen(): void;
+    onRequestRename(value: string): void;
 }) {
     const { ui } = store;
     const { colors } = useTheme();
@@ -70,6 +72,11 @@ function FolderContentsItem({
                         color={colors.text}
                     />
             }
+            editing={ui.showInputOf === __ref}
+            blurEditing={() => ui.setShowInputOf(null)}
+            hasCheckbox={ui.selectionCount > 0}
+            onLongPress={() => ui.toggleSelectedItem(__ref as any)}
+            submitEditing={onRequestRename}
             checked={ui.selectedItems.has(__ref as any)}
             onCheckedChange={selectHandler}
         />

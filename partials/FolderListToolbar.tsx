@@ -23,6 +23,10 @@ function FolderListToolbar() {
         onActionHandler("delete", [...store.ui.selectedItems]);
     };
 
+    const renamePressHandler = () => {
+        onActionHandler("rename", [...store.ui.selectedItems]);
+    };
+
     return (
         <View className="flex-row items-center justify-between px-3 pb-2">
             <View className="flex-row items-center gap-x-4">
@@ -38,18 +42,14 @@ function FolderListToolbar() {
                             className="px-3 py-1 rounded-full gap-x-2"
                         >
                             <Icon name="close_line" size={18} />
-                            <Text>
-                                {store.ui.selectionCount} selected
-                            </Text>
+                            <Text>{store.ui.selectionCount} selected</Text>
                         </Button>
                         <IconButton
                             onPress={deletePressHandler}
                             name="delete_2_line"
                             size={22}
                         />
-                        <ItemsMenu
-                            refs={[...store.ui.selectedItems]}
-                        />
+                        <ItemsMenu refs={[...store.ui.selectedItems]} />
                     </>
                 :   <ListViewMenu />}
             </View>
@@ -91,11 +91,7 @@ const SortMenu = observer(() => {
                     {store.ui.sortField.field}
                 </Text>
             </PopoverTrigger>
-            <PopoverContent
-                side="bottom"
-                align="start"
-                className="w-auto p-0"
-            >
+            <PopoverContent side="bottom" align="start" className="w-auto p-0">
                 {fields.map((field) => (
                     <PopoverClose asChild key={field.value}>
                         <Pressable
@@ -104,12 +100,8 @@ const SortMenu = observer(() => {
                         >
                             <Text>{field.label}</Text>
                             <View className="-my-2 -mr-2 size-8">
-                                {store.ui.sortField.field
-                                    === field.value && (
-                                    <IconButton
-                                        name="check_line"
-                                        size={18}
-                                    />
+                                {store.ui.sortField.field === field.value && (
+                                    <IconButton name="check_line" size={18} />
                                 )}
                             </View>
                         </Pressable>
@@ -138,26 +130,17 @@ const ListViewMenu = observer(() => {
             <PopoverTrigger>
                 <IconButton name="menu_line" size={22} />
             </PopoverTrigger>
-            <PopoverContent
-                side="bottom"
-                align="end"
-                className="w-auto p-0"
-            >
+            <PopoverContent side="bottom" align="end" className="w-auto p-0">
                 {list.map((view) => (
                     <PopoverClose asChild key={view.value}>
                         <Pressable
-                            onPress={() =>
-                                store.ui.setListView(view.value)
-                            }
+                            onPress={() => store.ui.setListView(view.value)}
                             className="flex-row items-center justify-between px-4 py-2 gap-x-4"
                         >
                             <Text>{view.label}</Text>
                             <View className="-my-2 -mr-2 size-8">
                                 {store.ui.listView === view.value && (
-                                    <IconButton
-                                        name="check_line"
-                                        size={18}
-                                    />
+                                    <IconButton name="check_line" size={18} />
                                 )}
                             </View>
                         </Pressable>

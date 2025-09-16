@@ -1,10 +1,10 @@
-import { Pressable, View } from "react-native";
+import { Pressable, TextInputProps, View } from "react-native";
 import Checkbox from "./Checkbox";
-import { ReactNode } from "react";
-// eslint-disable-next-line import/no-named-as-default
-import clsx from "clsx";
+import { ReactNode, useState } from "react";
 import { useTheme } from "@react-navigation/native";
 import { Text } from "./ui/text";
+import { cn } from "@/lib/utils";
+import { Input } from "./ui/input";
 
 interface ListItemProps {
     title: string;
@@ -13,9 +13,13 @@ interface ListItemProps {
     prepend?: ReactNode;
     hasCheckbox?: boolean;
     checked?: boolean;
+    editing?: boolean;
+    blurEditing?(): void;
+    submitEditing?(value: string): void;
     onCheckedChange?(): void;
     isCompact?: boolean;
     onPress?(): void;
+    onLongPress?(): void;
 }
 
 export default function ListItem({
@@ -26,56 +30,67 @@ export default function ListItem({
     prepend,
     isCompact,
     checked,
+    editing,
+    blurEditing,
+    submitEditing,
     onCheckedChange,
+    onLongPress,
     onPress,
 }: ListItemProps) {
     const { colors } = useTheme();
+
+    const submit = (value: string) => {
+        if (value === title) return;
+        submitEditing?.(title);
+    };
+
     return (
-        <View
-            className={clsx(
-                "flex-row flex-1 gap-x-1",
-                isCompact ? "h-12" : "h-20",
+        <Pressable
+            className={cn(
+                "flex-row pl-3 items-center gap-x-3",
+                isCompact ? "h-12" : "h-16",
             )}
+            onLongPress={onLongPress}
+            onPress={onPress}
         >
             {hasCheckbox && (
-                <View
-                    className={clsx(
-                        !isCompact ? "-mt-0.5 pt-2" : "self-center",
-                    )}
+                <Pressable
+                    onPress={onCheckedChange}
+                    className="items-center -mx-2 justify-center h-full px-2"
                 >
-                    <Checkbox checked={checked} onChange={onCheckedChange} />
-                </View>
+                    <Checkbox checked={checked} />
+                </Pressable>
             )}
-            <Pressable
-                onPress={onPress}
-                android_ripple={{ color: colors.border }}
-                className={clsx(
-                    "flex-row rounded-l flex-1 px-3 gap-x-2",
-                    isCompact ? "items-center" : "pt-2 items-start",
-                )}
-            >
-                {(prepend || icon) && (
-                    <View>
-                        {prepend ?
-                            prepend
-                        : icon ?
-                            <View className={clsx(!isCompact && "mt-0.5")}>
-                                {icon}
-                            </View>
-                        :   undefined}
-                    </View>
-                )}
-                <View className="flex-col flex-1 gap-y-1">
-                    <Text numberOfLines={1} ellipsizeMode="middle">
-                        {title}
-                    </Text>
-                    {subtitle && !isCompact && (
-                        <Text variant="small" className="opacity-75">
-                            {subtitle}
-                        </Text>
-                    )}
+            {
+                <View className="flex-1 h-full pr-3 flex-row items-center gap-x-3  border-b border-neutral-200 dark:border-neutral-800">
+                    {icon}
+                    {editing ?
+                        <TextInput
+                            initialValue={title}
+                            onBlur={blurEditing}
+                            onSubmitEditing={({ nativeEvent: { text } }) =>
+                                submit(text)
+                            }
+                            className="flex-1 w-auto"
+                            autoFocus
+                        />
+                    :   <View className="h-full justify-center flex-1">
+                            <Text numberOfLines={1} ellipsizeMode="tail">
+                                {title}
+                            </Text>
+                        </View>
+                    }
                 </View>
-            </Pressable>
-        </View>
+            }
+        </Pressable>
     );
+}
+
+function TextInput({
+    initialValue,
+    ...props
+}: { initialValue: string } & TextInputProps) {
+    const [value, setValue] = useState(initialValue);
+
+    return <Input {...props} value={value} onChangeText={setValue} />;
 }

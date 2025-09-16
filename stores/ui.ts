@@ -4,15 +4,9 @@ import { action, computed, makeObservable, observable } from "mobx";
 import { ColorSchemeName } from "react-native";
 
 export type ListView = "compact" | "comfortable";
-type SelectedItem =
-    `${NonNullable<(File | Folder)["__typename"]>}:${string}`;
+type SelectedItem = `${NonNullable<(File | Folder)["__typename"]>}:${string}`;
 
-export const sortFields = [
-    "name",
-    "size",
-    "createdAt",
-    "updatedAt",
-] as const;
+export const sortFields = ["name", "size", "createdAt", "updatedAt"] as const;
 export const sortOrder = ["asc", "desc"] as const;
 
 type sortOption =
@@ -24,6 +18,7 @@ export class UIStore {
     selectedItems: Set<SelectedItem> = new Set();
     sort: sortOption = "name:asc";
     searchOpen: boolean = false;
+    showInputOf: string | null = null;
 
     constructor() {
         makeObservable(this, {
@@ -32,6 +27,7 @@ export class UIStore {
             selectedItems: observable,
             sort: observable,
             searchOpen: observable,
+            showInputOf: observable,
             isCompact: computed,
             selectionCount: computed,
             sortField: computed,
@@ -41,6 +37,7 @@ export class UIStore {
             clearSelection: action,
             setSort: action,
             setSearchOpen: action,
+            setShowInputOf: action,
         });
     }
 
@@ -82,5 +79,9 @@ export class UIStore {
 
     setSearchOpen(open: boolean) {
         this.searchOpen = open;
+    }
+
+    setShowInputOf(id: string | null) {
+        this.showInputOf = id;
     }
 }

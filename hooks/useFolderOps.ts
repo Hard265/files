@@ -94,6 +94,34 @@ export function useFolderOps(id: string | null) {
                         });
                 });
             },
+            rename: (ref: __ref, name: string) => {
+                const [type, id] = ref.split(":");
+                if (type === "File")
+                    return updateFile({
+                        variables: {
+                            id,
+                            input: {
+                                name,
+                            },
+                        },
+                        context: {
+                            ref,
+                        },
+                    });
+
+                if (type === "Folder")
+                    return updateFolder({
+                        variables: {
+                            id,
+                            input: {
+                                name,
+                            },
+                        },
+                        context: {
+                            ref,
+                        },
+                    });
+            },
             star: (refs: __ref[] = [], isStarred: boolean) => {
                 if (refs.length === 0) return;
                 refs.forEach((ref) => {

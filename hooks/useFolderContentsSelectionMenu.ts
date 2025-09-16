@@ -2,6 +2,7 @@ import Icon from "@/components/Icon";
 import { useFolderOpsContext } from "@/providers/FolderOpsProvider";
 import { useUI } from "@/providers/UIProvider";
 import { RootStackParamsList } from "@/Router";
+import store from "@/stores";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ComponentProps, useCallback, useMemo } from "react";
@@ -34,9 +35,7 @@ type ActionHandlerMap = Record<
 
 export default function useFolderContentsSelectionMenu() {
     const navigation =
-        useNavigation<
-            NativeStackNavigationProp<RootStackParamsList>
-        >();
+        useNavigation<NativeStackNavigationProp<RootStackParamsList>>();
     const { openDialog } = useUI();
     const folderOps = useFolderOpsContext();
 
@@ -89,7 +88,7 @@ export default function useFolderContentsSelectionMenu() {
                 console.log("Downloading items:", items);
             },
             rename: (items) => {
-                console.log("Renaming items:", items);
+                store.ui.setShowInputOf(items[0]);
             },
             move: (items) => {
                 console.log("Moving items:", items);
@@ -114,9 +113,7 @@ export default function useFolderContentsSelectionMenu() {
             if (handleAction) {
                 handleAction(items);
             } else {
-                console.warn(
-                    `No handler found for action: ${action}`,
-                );
+                console.warn(`No handler found for action: ${action}`);
             }
         },
         [actionHandlers],

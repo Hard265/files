@@ -17,6 +17,7 @@ import { FolderContentsItemSkeleton } from "./folder-contents-item-skeleton";
 import FolderContentsEmpty from "./folder-contents-empty";
 import _ from "lodash";
 import { DrawerScreenProps } from "@react-navigation/drawer";
+import { useFolderOpsContext } from "@/providers/FolderOpsProvider";
 
 function FolderContents({
     navigation,
@@ -24,14 +25,16 @@ function FolderContents({
     | DrawerScreenProps<RootStackParamsList>
     | NativeStackScreenProps<RootStackParamsList>) {
     const route = useRoute<RouteProp<RootStackParamsList, "Folder">>();
+    const folderOps = useFolderOpsContext();
     const [isPending, startTransition] = useTransition();
     const { data, refetch } = useSuspenseQuery(GetFolderContentsDocument, {
         variables: {
             folderId: _.defaultTo(route.params?.id, null),
         },
     });
+
     const items = [...data.folders, ...data.files] as (File | Folder)[];
-    console.log(navigation.getState().type);
+
     const onOpenHandler = useCallback(
         (id: string) => {
             if (navigation.getState().type === "drawer") {
@@ -46,6 +49,13 @@ function FolderContents({
         [navigation],
     );
 
+    const onRenameHandler = useCallback(
+        (id: string, type: "Folder" | "File", name: string) => {
+            folderOps.rename(`${type}:${id}`, name);
+        },
+        [folderOps],
+    );
+
     const render = ({ item }: { item: (typeof items)[number] }) => {
         return (
             <ErrorBoundary fallback={<Text>error</Text>}>
@@ -54,6 +64,10 @@ function FolderContents({
                         id={item.id}
                         type={item.__typename}
                         onOpen={() => onOpenHandler(item.id)}
+                        onRequestRename={(name) => {
+                            if (!item.__typename) return;
+                            onRenameHandler(item.id, item.__typename, name);
+                        }}
                     />
                 </Suspense>
             </ErrorBoundary>
