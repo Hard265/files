@@ -13,13 +13,9 @@ import {
     FolderPermissionFieldsFragment,
     ItemAccessDetailsDocument,
 } from "@/graphql/__generated__/graphql";
-import { RootStackParamsList } from "@/Router";
+import { RootStackParamList } from "@/navigators/Root";
 import { useSuspenseQuery } from "@apollo/client/react";
-import { useNavigation } from "@react-navigation/native";
-import {
-    NativeStackNavigationProp,
-    NativeStackScreenProps,
-} from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useMemo } from "react";
 import { ScrollView, View } from "react-native";
 
@@ -28,9 +24,7 @@ type ItemType = "File" | "Folder";
 type TabType = "people" | "links";
 
 // Utility functions
-const parseItemRef = (
-    ref: string,
-): [ItemType | null, string | null] => {
+const parseItemRef = (ref: string): [ItemType | null, string | null] => {
     const parts = ref.split(":");
     if (parts.length !== 2) return [null, null];
 
@@ -41,26 +35,20 @@ const parseItemRef = (
 };
 
 export default function ManageAccessPage({
+    navigation,
     route,
-}: NativeStackScreenProps<RootStackParamsList, "ManageAccess">) {
-    const navigation =
-        useNavigation<
-            NativeStackNavigationProp<RootStackParamsList>
-        >();
+}: NativeStackScreenProps<RootStackParamList, "ManageAccess">) {
     const [type, id] = parseItemRef(route.params.ref);
     const tab = (route.params.tab ?? "people") as TabType;
 
-    const { data, error } = useSuspenseQuery(
-        ItemAccessDetailsDocument,
-        {
-            variables: {
-                id,
-                isFolder: type === "Folder",
-                isFile: type === "File",
-            },
-            errorPolicy: "all",
+    const { data } = useSuspenseQuery(ItemAccessDetailsDocument, {
+        variables: {
+            id,
+            isFolder: type === "Folder",
+            isFile: type === "File",
         },
-    );
+        errorPolicy: "all",
+    });
 
     const permissions = useMemo(
         () =>
@@ -71,10 +59,7 @@ export default function ManageAccessPage({
                 | FolderPermissionFieldsFragment
                 | FilePermissionFieldsFragment
             )[],
-        [
-            data?.filePermissionsByFileId,
-            data?.folderPermissionsByFolderId,
-        ],
+        [data?.filePermissionsByFileId, data?.folderPermissionsByFolderId],
     );
 
     const onSwitchTab = useCallback(
@@ -105,10 +90,7 @@ export default function ManageAccessPage({
                     className="w-full"
                 >
                     <TabsList className="w-full bg-transparent">
-                        <TabsTrigger
-                            value="people"
-                            className="flex-1"
-                        >
+                        <TabsTrigger value="people" className="flex-1">
                             <Text>People ({permissions.length})</Text>
                         </TabsTrigger>
                         <TabsTrigger value="links" className="flex-1">

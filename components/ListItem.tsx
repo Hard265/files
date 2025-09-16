@@ -35,7 +35,6 @@ export default function ListItem({
             className={clsx(
                 "flex-row flex-1 gap-x-1",
                 isCompact ? "h-12" : "h-20",
-                hasCheckbox ? "pl-3" : "pl-4",
             )}
         >
             {hasCheckbox && (
@@ -44,17 +43,14 @@ export default function ListItem({
                         !isCompact ? "-mt-0.5 pt-2" : "self-center",
                     )}
                 >
-                    <Checkbox
-                        checked={checked}
-                        onChange={onCheckedChange}
-                    />
+                    <Checkbox checked={checked} onChange={onCheckedChange} />
                 </View>
             )}
             <Pressable
                 onPress={onPress}
                 android_ripple={{ color: colors.border }}
                 className={clsx(
-                    "flex-row rounded-l flex-1 pl-2 pr-4 gap-x-2",
+                    "flex-row rounded-l flex-1 px-3 gap-x-2",
                     isCompact ? "items-center" : "pt-2 items-start",
                 )}
             >
@@ -63,11 +59,7 @@ export default function ListItem({
                         {prepend ?
                             prepend
                         : icon ?
-                            <View
-                                className={clsx(
-                                    !isCompact && "mt-0.5",
-                                )}
-                            >
+                            <View className={clsx(!isCompact && "mt-0.5")}>
                                 {icon}
                             </View>
                         :   undefined}

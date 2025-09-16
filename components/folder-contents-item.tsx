@@ -39,12 +39,8 @@ function FolderContentsItem({
 
     const subtitle = useMemo(() => {
         const size =
-            data.__typename === "File" ?
-                formatBytesIEC(data.size)
-            :   " ";
-        return dayjs(data.updatedAt).format(
-            `[Modified] DD YYYY [${size}]`,
-        );
+            data.__typename === "File" ? formatBytesIEC(data.size) : " ";
+        return dayjs(data.updatedAt).format(`[Modified] DD YYYY [${size}]`);
         //@ts-ignore
     }, [data.__typename, data.size, data.updatedAt]);
 
@@ -67,18 +63,13 @@ function FolderContentsItem({
             onPress={pressHandler}
             icon={
                 type === "Folder" ?
-                    <Icon
-                        name="folder_3_line"
-                        size={24}
-                        color={colors.text}
-                    />
+                    <Icon name="folder_3_line" size={24} color={colors.text} />
                 :   <Icon
                         name="document_3_line"
                         size={24}
                         color={colors.text}
                     />
             }
-            hasCheckbox
             checked={ui.selectedItems.has(__ref as any)}
             onCheckedChange={selectHandler}
         />
